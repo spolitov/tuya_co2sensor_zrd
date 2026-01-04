@@ -43,7 +43,7 @@
 
 #define APP_RELEASE                         0x10        //app release 1.0
 #ifndef VERSION_BUILD
-    #define APP_BUILD                       0x04        //app build 04, full version - v1.0.04
+    #define APP_BUILD                       0x05        //app build 04, full version - v1.0.04
 #endif
 #define STACK_RELEASE						0x30        //stack release 3.0
 #define STACK_BUILD							0x01        //stack build 01
@@ -103,7 +103,8 @@
  */
 #define TELINK_MANUF_CODE           0x1141
 #define SLACKY_MANUF_CODE           0x6565
-#define MANUFACTURER_CODE_TELINK    SLACKY_MANUF_CODE//Custom ID
+#define MAHTAN_MANUF_CODE           0x6655
+#define MANUFACTURER_CODE_TELINK    MAHTAN_MANUF_CODE//Custom ID
 #define	IMAGE_TYPE					((CHIP_TYPE << 8) | IMAGE_TYPE_APP)
 #define	FILE_VERSION				((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 

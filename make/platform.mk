@@ -2,8 +2,9 @@
 OUT_DIR += \
 /platform/chip_8258 \
 /platform/chip_8258/flash \
-/platform/services
- 
+/platform/services \
+/platform/services/b85m
+
  
 OBJS += \
 $(OUT_PATH)/platform/chip_8258/flash.o \
@@ -23,6 +24,6 @@ $(OUT_PATH)/platform/services/b85m/irq_handler.o
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUT_PATH)/platform/%.o: $(SDK_PATH)/platform/%.c
-	@echo 'Building file: $<'
+	@echo 'Building file: $< => $@'
 	@$(CC) $(GCC_FLAGS) $(INCLUDE_PATHS) -c -o"$@" "$<"
 

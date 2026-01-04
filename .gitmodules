@@ -1,0 +1,3 @@
+[submodule "telink_zigbee_sdk"]
+	path = telink_zigbee_sdk
+	url = https://github.com/telink-semi/telink_zigbee_sdk

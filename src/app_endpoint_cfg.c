@@ -37,34 +37,14 @@
 const uint16_t app_ep1_inClusterList[] = {
     ZCL_CLUSTER_GEN_BASIC,
     ZCL_CLUSTER_GEN_IDENTIFY,
-#ifdef ZCL_GROUP
     ZCL_CLUSTER_GEN_GROUPS,
-#endif
-#ifdef ZCL_SCENE
     ZCL_CLUSTER_GEN_SCENES,
-#endif
-#ifdef ZCL_ON_OFF
     ZCL_CLUSTER_GEN_ON_OFF,
-#endif
-#ifdef ZCL_ZLL_COMMISSIONING
-    ZCL_CLUSTER_TOUCHLINK_COMMISSIONING,
-#endif
-#ifdef ZCL_LEVEL_CTRL
-    ZCL_CLUSTER_GEN_LEVEL_CONTROL,
-#endif
-#ifdef ZCL_CO2_MEASUREMENT
     ZCL_CLUSTER_MS_CO2_MEASUREMENT,
-#endif
-#ifdef ZCL_FHYD_MEASUREMENT
     ZCL_CLUSTER_MS_FHYD_MEASUREMENT,
-#endif
-#ifdef ZCL_TEMPERATURE_MEASUREMENT
     ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
-#endif
     ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,
-#ifdef ZCL_ANALOG_INPUT
     ZCL_CLUSTER_GEN_ANALOG_INPUT_BASIC
-#endif
 };
 
 /**
@@ -96,8 +76,6 @@ const af_simple_descriptor_t app_ep1Desc = {
     (uint16_t *)app_ep1_inClusterList,      /* Application input cluster list */
     (uint16_t *)app_ep1_outClusterList,     /* Application output cluster list */
 };
-
-
 
 /* Basic */
 zcl_basicAttr_t g_zcl_basicAttrs =
@@ -267,30 +245,13 @@ const zclAttrInfo_t fhyd_attrTbl[] = {
 
 #endif
 
-#ifdef ZCL_ANALOG_INPUT
+bool calibrateOnOff = false;
 
-zcl_aInputAttr_t g_zcl_aInputAttrs = {
-        .out_of_service = 0,
-        .value = 0,
-        .status_flag = 0,
-        .app_type.index = ZCL_ANALOG_INPUT_ATTRID_TYPE_IDX_VOC,
-        .app_type.type = 0x05,
-        .app_type.group = 0,
+const zclAttrInfo_t onOff_attrTbl[] =
+{
+	{ ZCL_ATTRID_ONOFF, ZCL_DATA_TYPE_BOOLEAN, RR, (u8*)&calibrateOnOff},
+	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16, R, (u8*)&zcl_attr_global_clusterRevision},
 };
-
-const zclAttrInfo_t aInput_attrTbl[] = {
-        { ZCL_ANALOG_INPUT_ATTRID_OUT_OF_SERVICE,   ZCL_BOOLEAN,    RW,     (uint8_t*)&g_zcl_aInputAttrs.out_of_service },
-        { ZCL_ANALOG_INPUT_ATTRID_PRESENT_VALUE,    ZCL_SINGLE,     RWR,    (uint8_t*)&g_zcl_aInputAttrs.value          },
-        { ZCL_ANALOG_INPUT_ATTRID_STATUS_FLAG,      ZCL_BITMAP8,    RR,     (uint8_t*)&g_zcl_aInputAttrs.status_flag    },
-        { ZCL_ANALOG_INPUT_ATTRID_APPLICATION_TYPE, ZCL_UINT32,     R,      (uint8_t*)&g_zcl_aInputAttrs.app_type       },
-
-        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,       ZCL_UINT16,     R,      (uint8_t*)&zcl_attr_global_clusterRevision  },
-
-};
-
-#define ZCL_AINPUT_ATTR_NUM   sizeof(aInput_attrTbl) / sizeof(zclAttrInfo_t)
-
-#endif
 
 /**
  *  @brief Definition for simple switch ZCL specific cluster
@@ -298,26 +259,13 @@ const zclAttrInfo_t aInput_attrTbl[] = {
 const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
     {ZCL_CLUSTER_GEN_BASIC,     MANUFACTURER_CODE_NONE, ZCL_BASIC_ATTR_NUM,     basic_attrTbl,      zcl_basic_register,     app_basicCb},
     {ZCL_CLUSTER_GEN_IDENTIFY,  MANUFACTURER_CODE_NONE, ZCL_IDENTIFY_ATTR_NUM,  identify_attrTbl,   zcl_identify_register,  app_identifyCb},
-#ifdef ZCL_GROUP
     {ZCL_CLUSTER_GEN_GROUPS,    MANUFACTURER_CODE_NONE, ZCL_GROUP_1ATTR_NUM,    group_attr1Tbl,     zcl_group_register,     NULL},
-#endif
-#ifdef ZCL_SCENE
     {ZCL_CLUSTER_GEN_SCENES,    MANUFACTURER_CODE_NONE, ZCL_SCENE_1ATTR_NUM,    scene_attr1Tbl,     zcl_scene_register,     app_sceneCb},
-#endif
-#ifdef ZCL_CO2_MEASUREMENT
     {ZCL_CLUSTER_MS_CO2_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_CO2_ATTR_NUM,  co2_attrTbl,    zcl_co2_measurement_register,   app_co2Cb},
-#endif
-#ifdef ZCL_TEMPERATURE_MEASUREMENT
     {ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_TEMPERATURE_ATTR_NUM,  temperature_attrTbl,    zcl_temperature_measurement_register,   app_temperatureCb},
-#endif
     {ZCL_CLUSTER_MS_RELATIVE_HUMIDITY, MANUFACTURER_CODE_NONE, ZCL_HUMIDITY_ATTR_NUM,  humidity_attrTbl,    zcl_humidity_measurement_register,   app_humidityCb},
-#ifdef ZCL_FHYD_MEASUREMENT
     {ZCL_CLUSTER_MS_FHYD_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_FHYD_ATTR_NUM,  fhyd_attrTbl,    zcl_fhyd_measurement_register,   app_fhydCb},
-#endif
-#ifdef ZCL_ANALOG_INPUT
-    {ZCL_CLUSTER_GEN_ANALOG_INPUT_BASIC, MANUFACTURER_CODE_NONE, ZCL_AINPUT_ATTR_NUM,  aInput_attrTbl,    zcl_analog_input_register,   app_aInputCb},
-#endif
+    {ZCL_CLUSTER_GEN_ON_OFF, MANUFACTURER_CODE_NONE, ARRAY_SIZE(onOff_attrTbl), onOff_attrTbl, zcl_onOff_register, app_onOffCb},
 };
 
-uint8_t APP_EP1_CB_CLUSTER_NUM = (sizeof(g_appEp1ClusterList)/sizeof(g_appEp1ClusterList[0]));
-
+uint8_t APP_EP1_CB_CLUSTER_NUM = ARRAY_SIZE(g_appEp1ClusterList);

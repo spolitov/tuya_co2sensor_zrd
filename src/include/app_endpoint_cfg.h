@@ -103,6 +103,7 @@ typedef struct __attribute__((packed)) {
 } zcl_aInputAttr_t;
 
 extern uint8_t APP_EP1_CB_CLUSTER_NUM;
+extern uint8_t APP_EP2_CB_CLUSTER_NUM;
 
 /* Attributes */
 extern zcl_basicAttr_t g_zcl_basicAttrs;

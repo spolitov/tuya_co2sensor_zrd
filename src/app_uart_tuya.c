@@ -275,6 +275,14 @@ static int32_t factory_reset_statusCb(void *arg) {
     return -1;
 }
 
+u8* str_add(u8* out, const char* input) {
+    unsigned int len = strlen(input);
+    memcpy(out, input, len);
+    return out + len;
+}
+
+uint8_t model_buffer[0x40];
+
 void uart_cmd_handler() {
 
     size_t load_size = 0;
@@ -448,11 +456,18 @@ void uart_cmd_handler() {
 
 #endif
 
+                                        u8* out = model_buffer + 1;
+                                        out = str_add(out, "Tuya_");
+                                        out = str_add(out, (const char*)ptr);
+                                        out = str_add(out, "_CO2_Mahtan");
+                                        *out = 0;
+                                        model_buffer[0] = out - model_buffer - 1;
+                                        zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_BASIC, ZCL_ATTRID_BASIC_MODEL_ID, model_buffer);
+
 #if UART_PRINTF_MODE
-                                        printf("Use modelId: %s\r\n", zb_modelId_arr[manuf_name]+1);
+                                        printf("Use modelId: %s\r\n", model_buffer + 1);
 #endif
 
-                                        zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_BASIC, ZCL_ATTRID_BASIC_MODEL_ID, zb_modelId_arr[manuf_name]);
                                         data_point_model = data_point_model_arr[manuf_name];
 
                                         break;

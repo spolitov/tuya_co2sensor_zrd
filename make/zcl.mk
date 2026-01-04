@@ -14,8 +14,6 @@ OUT_DIR += \
 /zigbee/zcl/commissioning \
 /zigbee/zcl/closures \
  
-#$(OUT_PATH)/zigbee/zcl/zcl_reporting.o \
-
 OBJS += \
 $(OUT_PATH)/zigbee/zcl/zcl.o \
 $(OUT_PATH)/zigbee/zcl/zcl_nv.o \
@@ -84,6 +82,7 @@ $(OUT_PATH)/zigbee/zcl/commissioning/zcl_commissioning_attr.o \
 $(OUT_PATH)/zigbee/zcl/closures/zcl_door_lock.o \
 $(OUT_PATH)/zigbee/zcl/closures/zcl_door_lock_attr.o \
 $(OUT_PATH)/zigbee/zcl/closures/zcl_window_covering.o \
+$(OUT_PATH)/zigbee/zcl/zcl_reporting.o \
 $(OUT_PATH)/zigbee/zcl/closures/zcl_window_covering_attr.o 
 
 

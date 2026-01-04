@@ -68,7 +68,6 @@ extern bdb_commissionSetting_t g_bdbCommissionSetting;
 extern const zcl_specClusterInfo_t g_appEp1ClusterList[];
 extern const zcl_specClusterInfo_t g_appEp2ClusterList[];
 extern const af_simple_descriptor_t app_ep1Desc;
-extern const af_simple_descriptor_t app_ep2Desc;
 
 void app_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg);
 
@@ -83,6 +82,7 @@ status_t app_temperatureCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void
 status_t app_humidityCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t app_fhydCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t app_aInputCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
+status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 
 #define zcl_scene1AttrGet()         &g_zcl_scene1Attrs
 #define zcl_scene2AttrGet()         &g_zcl_scene2Attrs

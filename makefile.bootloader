@@ -2,7 +2,7 @@
 PROJECT_NAME := bootloader
 
 # Set the serial port number for downloading the firmware
-DOWNLOAD_PORT := COM3
+DOWNLOAD_PORT := COM5
 
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
@@ -27,7 +27,7 @@ LIBS := -ldrivers_8258
 MCU_TYPE = -DMCU_CORE_8258=1
 BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
 
-SDK_PATH := ./tl_zigbee_sdk
+SDK_PATH := ./telink_zigbee_sdk/tl_zigbee_sdk
 SRC_PATH := ./src
 OUT_PATH := ./out
 MAKE_INCLUDES := ./make

@@ -87,6 +87,37 @@ void stack_init(void)
     zb_zdoCbRegister((zdo_appIndCb_t *)&appCbLst);
 }
 
+#define PIN_CO2_PWM GPIO_PB4
+#define PIN_CALIBRATION GPIO_PA0
+
+void co2_pwm_rise(void);
+
+u32 last_rise_time = 0;
+u32 last_fall_time = 0;
+
+void co2_pwm_fall(void) {
+  last_fall_time = clock_time();
+
+  drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_CO2_PWM, GPIO_RISING_EDGE, co2_pwm_rise);
+}
+
+void co2_pwm_rise(void) {
+  u32 now = clock_time();
+
+  if (last_fall_time && last_rise_time && last_fall_time > last_rise_time &&
+      now > last_rise_time) {
+      int32_t d1 = (last_fall_time - last_rise_time - 2000 * S_TIMER_CLOCK_1US);
+      int32_t d2 = (now - last_rise_time - 4000 * S_TIMER_CLOCK_1US);
+      float co2 = d1 / 200.0f / d2;
+
+      zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_CO2_MEASUREMENT_ATTRID_MEASUREDVALUE, (uint8_t*)&co2);
+  }
+
+  last_rise_time = now;
+
+  drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_CO2_PWM, GPIO_FALLING_EDGE, co2_pwm_fall);
+}
+
 /*********************************************************************
  * @fn      user_app_init
  *
@@ -126,9 +157,15 @@ void user_app_init(void)
     ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&app_ep1Desc, &app_otaInfo, &app_otaCb);
 #endif
 
-
     app_uart_init();
 
+    drv_gpio_func_set(PIN_CO2_PWM);
+    drv_gpio_output_en(PIN_CO2_PWM, 0);
+    drv_gpio_input_en(PIN_CO2_PWM, 1);
+    drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_CO2_PWM, GPIO_RISING_EDGE, co2_pwm_rise);
+    drv_gpio_irq_en(PIN_CO2_PWM);
+
+    drv_enable_irq();
 }
 
 void app_task(void) {
@@ -216,3 +253,28 @@ void user_init(bool isRetention) {
     bdb_init((af_simple_descriptor_t *)&app_ep1Desc, &g_bdbCommissionSetting, &g_zbBdbCb, 1);
 }
 
+ev_timer_event_t *calibrationTimerEvt = NULL;
+
+int32_t calibrationFinish(void *arg) {
+    drv_gpio_write(PIN_CALIBRATION, 0);
+    drv_gpio_output_en(PIN_CALIBRATION, 0);
+    drv_gpio_input_en(PIN_CALIBRATION, 1);
+
+    calibrationTimerEvt = NULL;
+    return -1;
+}
+
+status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
+    if (cmdId == 1) {
+      if (calibrationTimerEvt) {
+        return ZCL_STA_DUPLICATE_EXISTS;
+      }
+      drv_gpio_func_set(PIN_CALIBRATION);
+      drv_gpio_output_en(PIN_CALIBRATION, 1);
+      drv_gpio_input_en(PIN_CALIBRATION, 0);
+      drv_gpio_write(PIN_CALIBRATION, 1);
+
+      calibrationTimerEvt = TL_ZB_TIMER_SCHEDULE(calibrationFinish, NULL, 8 * 1000);
+    }
+    return ZCL_STA_SUCCESS;
+}

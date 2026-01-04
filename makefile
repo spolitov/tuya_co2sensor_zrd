@@ -2,7 +2,7 @@
 PROJECT_NAME := tuya_co2sensor_zrd
 
 # Set the serial port number for downloading the firmware
-DOWNLOAD_PORT := COM3
+DOWNLOAD_PORT := COM5
 
 COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
 
@@ -22,7 +22,7 @@ DEVICE_TYPE = -DROUTER=1
 MCU_TYPE = -DMCU_CORE_8258=1
 BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
 
-SDK_PATH := ./tl_zigbee_sdk
+SDK_PATH := telink_zigbee_sdk/tl_zigbee_sdk
 SRC_PATH := ./src
 OUT_PATH := ./out
 BIN_PATH := ./bin
@@ -31,7 +31,7 @@ TOOLS_PATH := ./tools
 BOOT_FILE := $(OUT_PATH)/bootloader.bin
 VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
 VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
-ZCL_VERSION_FILE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src |  sed -e "'s/./\'&\',/g'" -e "'s/.$$//'")
+#ZCL_VERSION_FILE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src | sed "s/./X&X,/g; s/,$$//" | tr X '\''\'\'''\'')
 BOOT_SIZE := $(shell ls -l $(BOOT_FILE) | awk '{print $$5}')
 
 
@@ -158,9 +158,9 @@ erase-flash:
 #	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x0 0xfc000
 #	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0xff000 0x1000
 	
-erase-flash-fimware:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x8000 0xF4000
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0xff000 0x1000
+erase-flash-firmware:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x8000 0x60000
+#	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0xff000 0x1000
 
 erase-flash-bootloader:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x0 0x8000
@@ -184,7 +184,7 @@ main-build: clean-project $(ELF_FILE) secondary-outputs
 $(ELF_FILE): $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: TC32 C Linker'
-	$(LD) --gc-sections -L $(SDK_PATH)/zigbee/lib/tc32 -L $(SDK_PATH)/platform/lib -L $(SDK_PATH)/platform/tc32 -T $(LS_FLAGS) -o "$(ELF_FILE)" "$(BOOT_FILE).o" $(OBJS) $(USER_OBJS) $(LIBS) 
+	$(LD) --gc-sections -L $(SDK_PATH)/zigbee/lib/tc32 -L $(SDK_PATH)/platform/lib -L $(SDK_PATH)/platform/tc32 -T $(LS_FLAGS) -o "$(ELF_FILE)" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	

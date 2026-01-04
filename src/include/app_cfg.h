@@ -55,7 +55,7 @@ extern "C" {
  * Product Information
  */
 
-#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#define ZCL_BASIC_MFG_NAME     {10, 'M','a','h','t','a','n','-','D','I','Y'}
 /* Tuya Custom CO2 sensor */
 #define ZCL_BASIC_MODEL_ID     {ZB_MODELID_SIZE, 'T','u','y','a','_','C','O','2','S','e','n','s','o','r','_','r','0','1'}
 
@@ -66,7 +66,7 @@ extern "C" {
 #include "version_cfg.h"
 
 /* Debug mode config */
-#define	UART_PRINTF_MODE                ON
+#define	UART_PRINTF_MODE                OFF
 #define USB_PRINTF_MODE         		OFF
 
 #define DEBUG_PKT                       ON
@@ -202,12 +202,10 @@ extern "C" {
 #define ZCL_TEMPERATURE_MEASUREMENT_SUPPORT         ON
 #define ZCL_HUMIDITY_MEASUREMENT_SUPPORT            ON
 #define ZCL_FHYD_MEASUREMENT_SUPPORT                ON
-#define ZCL_ANALOG_INPUT_SUPPORT                    ON
 #if TOUCHLINK_SUPPORT
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 #endif
-
-
+#define ZCL_ON_OFF_SUPPORT                          ON
 
 /**********************************************************************
  * Stack configuration
