@@ -3,9 +3,8 @@ OUT_DIR += \
 /$(SRC_PATH) \
 /$(SRC_PATH)/zcl \
 /$(SRC_PATH)/common
- 
+
 OBJS += \
-$(OUT_PATH)/$(SRC_PATH)/common/main.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_concentration_measurement.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_relative_humidity_measurement.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_analog_input.o \

@@ -284,6 +284,9 @@ u8* str_add(u8* out, const char* input) {
 uint8_t model_buffer[0x40];
 
 void uart_cmd_handler() {
+    if (model_buffer[0] != 0x25) {
+      return;
+    }
 
     size_t load_size = 0;
     uint8_t ch, complete = false;

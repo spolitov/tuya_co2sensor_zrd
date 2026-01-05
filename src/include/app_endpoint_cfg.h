@@ -102,11 +102,7 @@ typedef struct __attribute__((packed)) {
     aInput_appType_t app_type;
 } zcl_aInputAttr_t;
 
-extern uint8_t APP_EP1_CB_CLUSTER_NUM;
-extern uint8_t APP_EP2_CB_CLUSTER_NUM;
-
 /* Attributes */
-extern zcl_basicAttr_t g_zcl_basicAttrs;
 extern zcl_identifyAttr_t g_zcl_identifyAttrs;
 extern zcl_groupAttr_t g_zcl_group1Attrs;
 extern zcl_sceneAttr_t g_zcl_scene1Attrs;
@@ -114,5 +110,14 @@ extern zcl_co2Attr_t g_zcl_co2Attrs;
 extern zcl_temperatureAttr_t g_zcl_temperatureAttrs;
 extern zcl_humidityAttr_t g_zcl_humidityAttrs;
 extern zcl_aInputAttr_t g_zcl_aInputAttrs;
+
+typedef struct {
+  int id;
+  const af_simple_descriptor_t* descriptor;
+  int cluster_size;
+  const zcl_specClusterInfo_t* cluster;
+} EndpointInfo;
+
+EndpointInfo* get_endpoints();
 
 #endif /* SRC_INCLUDE_APP_ENDPOINT_CFG_H_ */

@@ -31,7 +31,7 @@ TOOLS_PATH := ./tools
 BOOT_FILE := $(OUT_PATH)/bootloader.bin
 VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
 VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
-#ZCL_VERSION_FILE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src | sed "s/./X&X,/g; s/,$$//" | tr X '\''\'\'''\'')
+BUILD_DATE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src )
 BOOT_SIZE := $(shell ls -l $(BOOT_FILE) | awk '{print $$5}')
 
 
@@ -71,15 +71,9 @@ GCC_FLAGS := \
 -fshort-wchar \
 -fms-extensions
 
-ifeq ($(strip $(ZCL_VERSION_FILE)),)
-GCC_FLAGS += \
--DBUILD_DATE="{8,'2','0','2','3','1','1','1','7'}"
-else
-GCC_FLAGS += \
--DBUILD_DATE="{8,$(ZCL_VERSION_FILE)}"
-endif
-  
- ifeq ($(CHECK_BL),1)
+GCC_FLAGS += -DBUILD_DATE=$(BUILD_DATE)
+
+ifeq ($(CHECK_BL),1)
 VERSION_BUILD = 00
 GCC_FLAGS += \
 -DCHECK_BOOTLOADER \
@@ -109,6 +103,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include $(MAKE_INCLUDES)/zdo.mk
+-include $(MAKE_INCLUDES)/apps.mk
 -include $(MAKE_INCLUDES)/zcl.mk
 -include $(MAKE_INCLUDES)/wwah.mk
 -include $(MAKE_INCLUDES)/ss.mk

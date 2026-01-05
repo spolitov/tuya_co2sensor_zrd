@@ -56,9 +56,6 @@ extern "C" {
  */
 
 #define ZCL_BASIC_MFG_NAME     {10, 'M','a','h','t','a','n','-','D','I','Y'}
-/* Tuya Custom CO2 sensor */
-#define ZCL_BASIC_MODEL_ID     {ZB_MODELID_SIZE, 'T','u','y','a','_','C','O','2','S','e','n','s','o','r','_','r','0','1'}
-
 
 /**********************************************************************
  * Version configuration
@@ -67,7 +64,7 @@ extern "C" {
 
 /* Debug mode config */
 #define	UART_PRINTF_MODE                OFF
-#define USB_PRINTF_MODE         		OFF
+#define USB_PRINTF_MODE         	    	OFF
 
 #define DEBUG_PKT                       ON
 #define DEBUG_PKT_FILTER                OFF

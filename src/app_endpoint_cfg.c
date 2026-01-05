@@ -3,12 +3,6 @@
 
 #include "app_main.h"
 
-#ifndef ZCL_BASIC_MFG_NAME
-#define ZCL_BASIC_MFG_NAME          {6,'T','E','L','I','N','K'}
-#endif
-#ifndef ZCL_BASIC_MODEL_ID
-#define ZCL_BASIC_MODEL_ID          {8,'T','L','S','R','8','2','x','x'}
-#endif
 #ifndef ZCL_BASIC_SW_BUILD_ID
 #define ZCL_BASIC_SW_BUILD_ID       {10,'0','1','2','2','0','5','2','0','1','7'}
 #endif
@@ -31,29 +25,23 @@
 #define ZCL_UTC         ZCL_DATA_TYPE_UTC
 #define ZCL_SINGLE      ZCL_DATA_TYPE_SINGLE_PREC
 
-/**
- *  @brief Definition for Incoming cluster / Sever Cluster
- */
+#define ZCL_BASIC_MODEL_ID     {ZB_MODELID_SIZE, 'T','u','y','a','_','C','O','2','S','e','n','s','o','r','_','r','0','1'}
+
 const uint16_t app_ep1_inClusterList[] = {
-    ZCL_CLUSTER_GEN_BASIC,
-    ZCL_CLUSTER_GEN_IDENTIFY,
-    ZCL_CLUSTER_GEN_GROUPS,
-    ZCL_CLUSTER_GEN_SCENES,
-    ZCL_CLUSTER_GEN_ON_OFF,
-    ZCL_CLUSTER_MS_CO2_MEASUREMENT,
-    ZCL_CLUSTER_MS_FHYD_MEASUREMENT,
-    ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
-    ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,
-    ZCL_CLUSTER_GEN_ANALOG_INPUT_BASIC
+  ZCL_CLUSTER_GEN_BASIC,
+  ZCL_CLUSTER_GEN_IDENTIFY,
+  ZCL_CLUSTER_GEN_GROUPS,
+  ZCL_CLUSTER_GEN_SCENES,
+  ZCL_CLUSTER_GEN_ON_OFF,
+  ZCL_CLUSTER_MS_CO2_MEASUREMENT,
+  ZCL_CLUSTER_MS_FHYD_MEASUREMENT,
+  ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
+  ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,
+  ZCL_CLUSTER_GEN_ANALOG_INPUT_BASIC
 };
 
-/**
- *  @brief Definition for Outgoing cluster / Client Cluster
- */
 const uint16_t app_ep1_outClusterList[] = {
-#ifdef ZCL_OTA
-    ZCL_CLUSTER_OTA,
-#endif
+  ZCL_CLUSTER_OTA,
 };
 
 /**
@@ -77,23 +65,26 @@ const af_simple_descriptor_t app_ep1Desc = {
     (uint16_t *)app_ep1_outClusterList,     /* Application output cluster list */
 };
 
-/* Basic */
-zcl_basicAttr_t g_zcl_basicAttrs =
-{
+void InitZclString(u8* buffer, const char* input) {
+  unsigned int len = strlen(input);
+  buffer[0] = len;
+  memcpy(buffer + 1, input, len);
+}
+
+zcl_basicAttr_t g_zcl_basicAttrs = {
     .zclVersion     = 0x03,
     .appVersion     = APP_RELEASE,
     .stackVersion   = (STACK_RELEASE|STACK_BUILD),
     .hwVersion      = HW_VERSION,
     .manuName       = ZCL_BASIC_MFG_NAME,
-    .modelId        = ZCL_BASIC_MODEL_ID,
-    .dateCode       = ZCL_BASIC_DATE_CODE,
+    .modelId        = {},
+    .dateCode       = {},
     .powerSource    = POWER_SOURCE_MAINS_1_PHASE,
     .swBuildId      = ZCL_BASIC_SW_BUILD_ID,
     .deviceEnable   = TRUE,
 };
 
-const zclAttrInfo_t basic_attrTbl[] =
-{
+const zclAttrInfo_t basic_attrTbl[] = {
     { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.zclVersion  },
     { ZCL_ATTRID_BASIC_APP_VER,             ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.appVersion  },
     { ZCL_ATTRID_BASIC_STACK_VER,           ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.stackVersion},
@@ -108,9 +99,6 @@ const zclAttrInfo_t basic_attrTbl[] =
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision},
 
 };
-
-#define ZCL_BASIC_ATTR_NUM       sizeof(basic_attrTbl) / sizeof(zclAttrInfo_t)
-
 
 /* Identify */
 zcl_identifyAttr_t g_zcl_identifyAttrs =
@@ -257,7 +245,7 @@ const zclAttrInfo_t onOff_attrTbl[] =
  *  @brief Definition for simple switch ZCL specific cluster
  */
 const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
-    {ZCL_CLUSTER_GEN_BASIC,     MANUFACTURER_CODE_NONE, ZCL_BASIC_ATTR_NUM,     basic_attrTbl,      zcl_basic_register,     app_basicCb},
+    {ZCL_CLUSTER_GEN_BASIC,     MANUFACTURER_CODE_NONE, ARRAY_SIZE(basic_attrTbl), basic_attrTbl,      zcl_basic_register,     app_basicCb},
     {ZCL_CLUSTER_GEN_IDENTIFY,  MANUFACTURER_CODE_NONE, ZCL_IDENTIFY_ATTR_NUM,  identify_attrTbl,   zcl_identify_register,  app_identifyCb},
     {ZCL_CLUSTER_GEN_GROUPS,    MANUFACTURER_CODE_NONE, ZCL_GROUP_1ATTR_NUM,    group_attr1Tbl,     zcl_group_register,     NULL},
     {ZCL_CLUSTER_GEN_SCENES,    MANUFACTURER_CODE_NONE, ZCL_SCENE_1ATTR_NUM,    scene_attr1Tbl,     zcl_scene_register,     app_sceneCb},
@@ -268,4 +256,20 @@ const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
     {ZCL_CLUSTER_GEN_ON_OFF, MANUFACTURER_CODE_NONE, ARRAY_SIZE(onOff_attrTbl), onOff_attrTbl, zcl_onOff_register, app_onOffCb},
 };
 
-uint8_t APP_EP1_CB_CLUSTER_NUM = ARRAY_SIZE(g_appEp1ClusterList);
+EndpointInfo* get_endpoints() {
+  InitZclString(g_zcl_basicAttrs.modelId, "Mahtan_CO2_DIY");
+  InitZclString(g_zcl_basicAttrs.dateCode, STRINGIFY(BUILD_DATE));
+
+  static EndpointInfo result[] = {
+    {
+      .id = APP_ENDPOINT1,
+      .descriptor = &app_ep1Desc,
+      .cluster_size = ARRAY_SIZE(g_appEp1ClusterList),
+      .cluster = g_appEp1ClusterList,
+    },
+    {
+      .id = 0
+    }
+  };
+  return result;
+}

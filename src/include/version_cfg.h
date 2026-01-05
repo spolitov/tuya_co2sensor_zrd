@@ -27,52 +27,17 @@
 
 #include "../common/comm_cfg.h"
 
-#if defined(MCU_CORE_826x)
-	#if (CHIP_8269)
-		#define CHIP_TYPE					TLSR_8269
-	#else
-		#define CHIP_TYPE					TLSR_8267
-	#endif
-#elif defined(MCU_CORE_8258)
-		#define CHIP_TYPE					TLSR_8258_1M //TLSR_8258_512K//
-#elif defined(MCU_CORE_8278)
-		#define CHIP_TYPE					TLSR_8278
-#elif defined(MCU_CORE_B91)
-		#define CHIP_TYPE					TLSR_B91
-#endif
+#define CHIP_TYPE					TLSR_8258_1M //TLSR_8258_512K//
 
 #define APP_RELEASE                         0x10        //app release 1.0
 #ifndef VERSION_BUILD
-    #define APP_BUILD                       0x05        //app build 04, full version - v1.0.04
+  #define APP_BUILD                       0x05        //app build 04, full version - v1.0.04
 #endif
 #define STACK_RELEASE						0x30        //stack release 3.0
 #define STACK_BUILD							0x01        //stack build 01
-#define HW_VERSION                          0x01
+#define HW_VERSION              0x01
 
-#ifndef ZCL_BASIC_MFG_NAME
-    #define ZCL_BASIC_MFG_NAME     {6,'T','E','L','I','N','K'}
-#endif
-#ifndef ZCL_BASIC_MODEL_ID
-    #define ZCL_BASIC_MODEL_ID     {8,'T','L','S','R','8','2','6','x'}
-#endif
-
-#ifndef BUILD_DATE
-#define BUILD_DATE "20241120"
-#endif
-
-#ifndef ZCL_BASIC_DATE_CODE
-#define ZCL_BASIC_DATE_CODE    BUILD_DATE
-#endif
-
-#ifndef ZCL_BASIC_LOC_DESC
-    #define ZCL_BASIC_LOC_DESC     {7,'U','N','K','N','O','W','N'}
-#endif
-#ifndef ZCL_BASIC_BUILD_ID
-    #define ZCL_BASIC_BUILD_ID     {10,'0','1','2','2','0','5','2','0','1','7'}
-#endif
-#ifndef ZCL_BASIC_SW_BUILD_ID //max 16 chars v1.3.02
-    #define ZCL_BASIC_SW_BUILD_ID       {7,'v',(APP_RELEASE>>4)+0x30,'.',(APP_RELEASE&0xf)+0x30,'.',(APP_BUILD>>4)+0x30,(APP_BUILD&0xf)+0x30}
-#endif
+#define ZCL_BASIC_SW_BUILD_ID       {7,'v',(APP_RELEASE>>4)+0x30,'.',(APP_RELEASE&0xf)+0x30,'.',(APP_BUILD>>4)+0x30,(APP_BUILD&0xf)+0x30}
 
 /*
  * 0x04 - Watermeter

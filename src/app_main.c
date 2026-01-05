@@ -1,180 +1,189 @@
 #include "app_main.h"
 
-//static uint32_t last_light = 0;
+#define PIN_LED GPIO_PB4
+#define PIN_BUTTON GPIO_PA0
 
 app_ctx_t g_appCtx = {
-        .bdbFBTimerEvt = NULL,
-        .short_poll = POLL_RATE * 3,
-        .long_poll = POLL_RATE * LONG_POLL,
+  .bdbFBTimerEvt = NULL,
+  .short_poll    = POLL_RATE * 3,
+  .long_poll     = POLL_RATE * LONG_POLL,
 };
-
-//uint32_t count_restart = 0;
 
 #ifdef ZCL_OTA
 extern ota_callBack_t app_otaCb;
 
 //running code firmware information
 ota_preamble_t app_otaInfo = {
-    .fileVer            = FILE_VERSION,
-    .imageType          = IMAGE_TYPE,
-    .manufacturerCode   = MANUFACTURER_CODE_TELINK,
+  .fileVer          = FILE_VERSION,
+  .imageType        = IMAGE_TYPE,
+  .manufacturerCode = MANUFACTURER_CODE_TELINK,
 };
 #endif
 
-
-//Must declare the application call back function which used by ZDO layer
-const zdo_appIndCb_t appCbLst = {
-    bdb_zdoStartDevCnf,//start device cnf cb
-    NULL,//reset cnf cb
-    NULL,//device announce indication cb
-    app_leaveIndHandler,//leave ind cb
-    app_leaveCnfHandler,//leave cnf cb
-    app_nwkUpdateIndicateHandler,//nwk update ind cb
-    NULL,//permit join ind cb
-    NULL,//nlme sync cnf cb
-    NULL,//tc join ind cb
-    NULL,//tc detects that the frame counter is near limit
+zdo_appIndCb_t app_ind_cb = {
+  .zdpStartDevCnfCb = bdb_zdoStartDevCnf,
+  .zdpResetCnfCb = NULL,
+  .zdpDevAnnounceIndCb = NULL,
+  .zdpLeaveIndCb = app_leaveIndHandler,
+  .zdpLeaveCnfCb = app_leaveCnfHandler,
+  .zdpNwkUpdateIndCb = app_nwkUpdateIndicateHandler,
+  .zdpPermitJoinIndCb = NULL,
+  .zdoNlmeSyncCnfCb = NULL,
+  .zdoTcJoinIndCb = NULL,
+  .ssTcFrameCntReachedCb = NULL,
+  .nwkStatusIndCb = NULL,
 };
 
-/**
- *  @brief Definition for bdb commissioning setting
- */
 bdb_commissionSetting_t g_bdbCommissionSetting = {
-    .linkKey.tcLinkKey.keyType = SS_GLOBAL_LINK_KEY,
-    .linkKey.tcLinkKey.key = (uint8_t *)tcLinkKeyCentralDefault,             //can use unique link key stored in NV
+  .linkKey.tcLinkKey.keyType = SS_GLOBAL_LINK_KEY,
+  .linkKey.tcLinkKey.key = (uint8_t *)tcLinkKeyCentralDefault,             //can use unique link key stored in NV
 
-    .linkKey.distributeLinkKey.keyType = MASTER_KEY,
-    .linkKey.distributeLinkKey.key = (uint8_t *)linkKeyDistributedMaster,    //use linkKeyDistributedCertification before testing
+  .linkKey.distributeLinkKey.keyType = MASTER_KEY,
+  .linkKey.distributeLinkKey.key = (uint8_t *)linkKeyDistributedMaster,    //use linkKeyDistributedCertification before testing
 
-    .linkKey.touchLinkKey.keyType = MASTER_KEY,
-    .linkKey.touchLinkKey.key = (uint8_t *)touchLinkKeyMaster,               //use touchLinkKeyCertification before testing
+  .linkKey.touchLinkKey.keyType = MASTER_KEY,
+  .linkKey.touchLinkKey.key = (uint8_t *)touchLinkKeyMaster,               //use touchLinkKeyCertification before testing
 
 #if TOUCHLINK_SUPPORT
-    .touchlinkEnable = 1,                                               /* enable touch-link */
+  .touchlinkEnable = 1,                                               /* enable touch-link */
 #else
-    .touchlinkEnable = 0,                                               /* disable touch-link */
+  .touchlinkEnable = 0,                                               /* disable touch-link */
 #endif
-    .touchlinkChannel = DEFAULT_CHANNEL,                                /* touch-link default operation channel for target */
-    .touchlinkLqiThreshold = 0xA0,                                      /* threshold for touch-link scan req/resp command */
+  .touchlinkChannel = DEFAULT_CHANNEL,                                /* touch-link default operation channel for target */
+  .touchlinkLqiThreshold = 0xA0,                                      /* threshold for touch-link scan req/resp command */
 };
 
-/**********************************************************************
- * LOCAL VARIABLES
- */
-
-
-/**********************************************************************
- * FUNCTIONS
- */
-
-
-/*********************************************************************
- * @fn      stack_init
- *
- * @brief   This function initialize the ZigBee stack and related profile. If HA/ZLL profile is
- *          enabled in this application, related cluster should be registered here.
- *
- * @param   None
- *
- * @return  None
- */
-void stack_init(void)
-{
-    /* Initialize ZB stack */
-    zb_init();
-
-    /* Register stack CB */
-    zb_zdoCbRegister((zdo_appIndCb_t *)&appCbLst);
+void stack_init(void) {
+  zb_init();
+  zb_zdoCbRegister(&app_ind_cb);
 }
 
 #define PIN_CO2_PWM GPIO_PB4
 #define PIN_CALIBRATION GPIO_PA0
 
-void co2_pwm_rise(void);
+uint32_t button_press_time = 0;
+unsigned long led_switch_time = 0;
+int led_state = 0;
+ev_timer_event_t* factory_reset_timer = NULL;
 
-u32 last_rise_time = 0;
-u32 last_fall_time = 0;
+void button_release();
 
-void co2_pwm_fall(void) {
-  last_fall_time = clock_time();
-
-  drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_CO2_PWM, GPIO_RISING_EDGE, co2_pwm_rise);
+int factory_reset_trigger(void* arg) {
+  zb_resetDevice2FN();
+  factory_reset_timer = NULL;
+  return -1;
 }
 
-void co2_pwm_rise(void) {
-  u32 now = clock_time();
+void button_press() {
+  button_press_time = clock_time();
 
-  if (last_fall_time && last_rise_time && last_fall_time > last_rise_time &&
-      now > last_rise_time) {
-      int32_t d1 = (last_fall_time - last_rise_time - 2000 * S_TIMER_CLOCK_1US);
-      int32_t d2 = (now - last_rise_time - 4000 * S_TIMER_CLOCK_1US);
-      float co2 = d1 / 200.0f / d2;
+  drv_gpio_irq_set(PIN_BUTTON, GPIO_RISING_EDGE);
 
-      zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_CO2_MEASUREMENT_ATTRID_MEASUREDVALUE, (uint8_t*)&co2);
+  if (!factory_reset_timer) {
+    factory_reset_timer = TL_ZB_TIMER_SCHEDULE(factory_reset_trigger, NULL, TIMEOUT_5SEC);
   }
-
-  last_rise_time = now;
-
-  drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_CO2_PWM, GPIO_FALLING_EDGE, co2_pwm_fall);
 }
 
-/*********************************************************************
- * @fn      user_app_init
- *
- * @brief   This function initialize the application(Endpoint) information for this node.
- *
- * @param   None
- *
- * @return  None
- */
-void user_app_init(void)
-{
+void button_release() {
+  button_press_time = 0;
+
+  drv_gpio_irq_set(PIN_BUTTON, GPIO_FALLING_EDGE);
+
+  if (factory_reset_timer) {
+    TL_ZB_TIMER_CANCEL(&factory_reset_timer);
+  }
+}
+
+bool reset_timer_started() {
+  return factory_reset_timer != NULL;
+}
+
+void user_app_init() {
+  drv_gpio_func_set(PIN_LED);
+  drv_gpio_output_en(PIN_LED, 1);
+  drv_gpio_input_en(PIN_LED, 0);
+  drv_gpio_write(PIN_LED, 1);
 
 #if ZCL_POLL_CTRL_SUPPORT
-    af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_PERIODICALLY);
+  af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_PERIODICALLY);
 #else
-    af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_WHEN_STIMULATED);
+  af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_WHEN_STIMULATED);
 #endif
 
-    /* Initialize ZCL layer */
-    /* Register Incoming ZCL Foundation command/response messages */
-    zcl_init(app_zclProcessIncomingMsg);
+  /* Initialize ZCL layer */
+  /* Register Incoming ZCL Foundation command/response messages */
+  zcl_init(app_zclProcessIncomingMsg);
 
-    /* register endPoint */
-    af_endpointRegister(APP_ENDPOINT1, (af_simple_descriptor_t *)&app_ep1Desc, zcl_rx_handler, NULL);
+  /* register endPoint */
+  EndpointInfo* endpoints = get_endpoints();
+  for (EndpointInfo* i = endpoints; i->id != 0; ++i) {
+    af_endpointRegister(i->id, i->descriptor, zcl_rx_handler, NULL);
+  }
 
-    zcl_reportingTabInit();
+  zcl_reportingTabInit();
 
-    /* Register ZCL specific cluster information */
-    zcl_register(APP_ENDPOINT1, APP_EP1_CB_CLUSTER_NUM, (zcl_specClusterInfo_t *)g_appEp1ClusterList);
+  /* Register ZCL specific cluster information */
+  for (EndpointInfo* i = endpoints; i->id != 0; ++i) {
+    zcl_register(i->id, i->cluster_size, i->cluster);
+  }
 
 #if ZCL_GP_SUPPORT
     /* Initialize GP */
-    gp_init(APP_ENDPOINT1);
+  gp_init(APP_ENDPOINT1);
 #endif
 
 #if ZCL_OTA_SUPPORT
-    ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&app_ep1Desc, &app_otaInfo, &app_otaCb);
+  ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&app_ep1Desc, &app_otaInfo, &app_otaCb);
 #endif
 
-    app_uart_init();
+    /*app_uart_init();
+*/
 
-    drv_gpio_func_set(PIN_CO2_PWM);
-    drv_gpio_output_en(PIN_CO2_PWM, 0);
-    drv_gpio_input_en(PIN_CO2_PWM, 1);
-    drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_CO2_PWM, GPIO_RISING_EDGE, co2_pwm_rise);
-    drv_gpio_irq_en(PIN_CO2_PWM);
+  drv_gpio_func_set(PIN_BUTTON);
+  drv_gpio_output_en(PIN_BUTTON, 0);
+  drv_gpio_input_en(PIN_BUTTON, 1);
+  drv_gpio_up_down_resistor(PIN_BUTTON, PM_PIN_PULLUP_10K);
 
-    drv_enable_irq();
+  drv_gpio_irq_config(GPIO_IRQ_MODE, PIN_BUTTON, GPIO_FALLING_EDGE, button_press);
+  drv_gpio_irq_en(PIN_BUTTON);
+
+  drv_enable_irq();
+
+  drv_gpio_write(PIN_LED, 0);
 }
 
-void app_task(void) {
+int zigbee_bound() {
+  return zb_getLocalShortAddr() < 0xFFF8;
+}
 
-    uart_cmd_handler();
+int desired_led_state() {
+  if (zigbee_bound()) {
+    return reset_timer_started();
+  }
+  if (clock_time_exceed(led_switch_time, TIMEOUT_TICK_100MS * 5)) {
+    return !led_state;
+  }
+  return led_state;
+}
 
-    if(bdb_isIdle()) {
-        report_handler();
-    }
+void update_led() {
+  int desired_state = desired_led_state();
+  if (desired_state != led_state) {
+    led_state = desired_state;
+    led_switch_time = clock_time();
+    drv_gpio_write(PIN_LED, led_state);
+  }
+}
+
+void app_task() {
+
+    // uart_cmd_handler();
+
+  if (bdb_isIdle()) {
+    report_handler();
+  }
+
+  update_led();
 }
 
 extern volatile uint16_t T_evtExcept[4];
