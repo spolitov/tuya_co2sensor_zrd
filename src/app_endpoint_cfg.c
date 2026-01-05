@@ -25,7 +25,43 @@
 #define ZCL_UTC         ZCL_DATA_TYPE_UTC
 #define ZCL_SINGLE      ZCL_DATA_TYPE_SINGLE_PREC
 
-#define ZCL_BASIC_MODEL_ID     {ZB_MODELID_SIZE, 'T','u','y','a','_','C','O','2','S','e','n','s','o','r','_','r','0','1'}
+/**
+ *  @brief Defined for basic cluster attributes
+ */
+typedef struct {
+  uint8_t  zclVersion;
+  uint8_t  appVersion;
+  uint8_t  stackVersion;
+  uint8_t  hwVersion;
+  uint8_t  manuName[ZCL_BASIC_MAX_LENGTH];
+  uint8_t  modelId[ZCL_BASIC_MAX_LENGTH];
+  uint8_t  dateCode[ZCL_BASIC_MAX_LENGTH];
+  uint8_t  powerSource;
+  uint8_t  genDevClass;                        //attr 8
+  uint8_t  genDevType;                         //attr 9
+  uint8_t  deviceEnable;
+  uint8_t  swBuildId[ZCL_BASIC_MAX_LENGTH];    //attr 4000
+} zcl_basicAttr_t;
+
+typedef struct{
+  u8  nameSupport;
+} zcl_groupAttr_t;
+
+typedef struct{
+  u8   sceneCount;
+  u8   currentScene;
+  u8   nameSupport;
+  bool sceneValid;
+  u16  currentGroup;
+} zcl_sceneAttr_t;
+
+typedef struct {
+  int16_t value;
+} zcl_temperatureAttr_t;
+
+typedef struct {
+  int16_t value;
+} zcl_humidityAttr_t;
 
 const uint16_t app_ep1_inClusterList[] = {
   ZCL_CLUSTER_GEN_BASIC,
@@ -34,35 +70,24 @@ const uint16_t app_ep1_inClusterList[] = {
   ZCL_CLUSTER_GEN_SCENES,
   ZCL_CLUSTER_GEN_ON_OFF,
   ZCL_CLUSTER_MS_CO2_MEASUREMENT,
-  ZCL_CLUSTER_MS_FHYD_MEASUREMENT,
   ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
   ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,
-  ZCL_CLUSTER_GEN_ANALOG_INPUT_BASIC
 };
 
 const uint16_t app_ep1_outClusterList[] = {
   ZCL_CLUSTER_OTA,
 };
 
-/**
- *  @brief Definition for Server cluster number and Client cluster number
- */
-#define APP_EP1_IN_CLUSTER_NUM   (sizeof(app_ep1_inClusterList)/sizeof(app_ep1_inClusterList[0]))
-#define APP_EP1_OUT_CLUSTER_NUM  (sizeof(app_ep1_outClusterList)/sizeof(app_ep1_outClusterList[0]))
-
-/**
- *  @brief Definition for simple description for HA profile
- */
 const af_simple_descriptor_t app_ep1Desc = {
-    HA_PROFILE_ID,                          /* Application profile identifier */
-    HA_DEV_SIMPLE_SENSOR,                   /* Application device identifier */
-    APP_ENDPOINT1,                          /* Endpoint */
-    2,                                      /* Application device version */
-    0,                                      /* Reserved */
-    APP_EP1_IN_CLUSTER_NUM,                 /* Application input cluster count */
-    APP_EP1_OUT_CLUSTER_NUM,                /* Application output cluster count */
-    (uint16_t *)app_ep1_inClusterList,      /* Application input cluster list */
-    (uint16_t *)app_ep1_outClusterList,     /* Application output cluster list */
+  .app_profile_id = HA_PROFILE_ID,
+  .app_dev_id = HA_DEV_SIMPLE_SENSOR,
+  .endpoint = APP_ENDPOINT1,
+  .app_dev_ver = 2,
+  .reserved = 0,
+  .app_in_cluster_count = ARRAY_SIZE(app_ep1_inClusterList),
+  .app_out_cluster_count = ARRAY_SIZE(app_ep1_outClusterList),
+  .app_in_cluster_lst = (uint16_t*)app_ep1_inClusterList,
+  .app_out_cluster_lst = (uint16_t*)app_ep1_outClusterList,
 };
 
 void InitZclString(u8* buffer, const char* input) {
@@ -72,16 +97,16 @@ void InitZclString(u8* buffer, const char* input) {
 }
 
 zcl_basicAttr_t g_zcl_basicAttrs = {
-    .zclVersion     = 0x03,
-    .appVersion     = APP_RELEASE,
-    .stackVersion   = (STACK_RELEASE|STACK_BUILD),
-    .hwVersion      = HW_VERSION,
-    .manuName       = ZCL_BASIC_MFG_NAME,
-    .modelId        = {},
-    .dateCode       = {},
-    .powerSource    = POWER_SOURCE_MAINS_1_PHASE,
-    .swBuildId      = ZCL_BASIC_SW_BUILD_ID,
-    .deviceEnable   = TRUE,
+  .zclVersion     = 0x03,
+  .appVersion     = APP_RELEASE,
+  .stackVersion   = (STACK_RELEASE|STACK_BUILD),
+  .hwVersion      = HW_VERSION,
+  .manuName       = ZCL_BASIC_MFG_NAME,
+  .modelId        = {},
+  .dateCode       = {},
+  .powerSource    = POWER_SOURCE_MAINS_1_PHASE,
+  .swBuildId      = ZCL_BASIC_SW_BUILD_ID,
+  .deviceEnable   = TRUE,
 };
 
 const zclAttrInfo_t basic_attrTbl[] = {
@@ -157,81 +182,26 @@ const zclAttrInfo_t scene_attr1Tbl[] = {
 
 #endif
 
-
-#ifdef ZCL_CO2_MEASUREMENT
-
-zcl_co2Attr_t g_zcl_co2Attrs = {
-        .value = 0.001014,
+AppAttributes attributes = {
+  .co2 = 0.001014,
+  .temperature = 0x8000,
+  .humidity = 0xffff,
 };
-
 
 const zclAttrInfo_t co2_attrTbl[] = {
-        { ZCL_CO2_MEASUREMENT_ATTRID_MEASUREDVALUE,     ZCL_SINGLE, RR, (uint8_t*)&g_zcl_co2Attrs.value             },
-        { ZCL_CO2_MEASUREMENT_ATTRID_MINMEASUREDVALUE,  ZCL_SINGLE, R,  (uint8_t*)&g_zcl_co2Attrs.min               },
-        { ZCL_CO2_MEASUREMENT_ATTRID_MAXMEASUREDVALUE,  ZCL_SINGLE, R,  (uint8_t*)&g_zcl_co2Attrs.max               },
-
-        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision  },
+  { ZCL_CO2_MEASUREMENT_ATTRID_MEASUREDVALUE, ZCL_SINGLE, RR, (uint8_t*)&attributes.co2 },
+  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,       ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision },
 };
-
-#define ZCL_CO2_ATTR_NUM   sizeof(co2_attrTbl) / sizeof(zclAttrInfo_t)
-
-#endif
-
-#ifdef ZCL_TEMPERATURE_MEASUREMENT
-zcl_temperatureAttr_t g_zcl_temperatureAttrs = {
-        .value = 0x8000,    /* temperature unknown  */
-        .minValue = 0xF060, /* -40.00               */
-        .maxValue = 0x2134, /* +85.00               */
-};
-
 
 const zclAttrInfo_t temperature_attrTbl[] = {
-        { ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE,     ZCL_INT16, RR, (uint8_t*)&g_zcl_temperatureAttrs.value      },
-        { ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MINMEASUREDVALUE,  ZCL_INT16, R,  (uint8_t*)&g_zcl_temperatureAttrs.minValue   },
-        { ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MAXMEASUREDVALUE,  ZCL_INT16, R,  (uint8_t*)&g_zcl_temperatureAttrs.maxValue   },
-
-        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision  },
+  { ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE, ZCL_INT16, RR, (uint8_t*)&attributes.temperature },
+  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,               ZCL_UINT16, R, (uint8_t*)&zcl_attr_global_clusterRevision },
 };
-
-#define ZCL_TEMPERATURE_ATTR_NUM   sizeof(temperature_attrTbl) / sizeof(zclAttrInfo_t)
-#endif
-
-
-zcl_humidityAttr_t g_zcl_humidityAttrs = {
-        .value = 0xffff,    /* temperature unknown  */
-        .minValue = 0x0000,
-        .maxValue = 0x2710, /* 100.00              */
-};
-
 
 const zclAttrInfo_t humidity_attrTbl[] = {
-        { ZCL_ATTRID_HUMIDITY_MEASUREDVALUE,     ZCL_UINT16, RR, (uint8_t*)&g_zcl_humidityAttrs.value      },
-        { ZCL_ATTRID_HUMIDITY_MINMEASUREDVALUE,  ZCL_UINT16, R,  (uint8_t*)&g_zcl_humidityAttrs.minValue   },
-        { ZCL_ATTRID_HUMIDITY_MAXMEASUREDVALUE,  ZCL_UINT16, R,  (uint8_t*)&g_zcl_humidityAttrs.maxValue   },
-
-        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision  },
+  { ZCL_ATTRID_HUMIDITY_MEASUREDVALUE,  ZCL_UINT16, RR, (uint8_t*)&attributes.humidity },
+  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision },
 };
-
-#define ZCL_HUMIDITY_ATTR_NUM   sizeof(humidity_attrTbl) / sizeof(zclAttrInfo_t)
-
-#ifdef ZCL_FHYD_MEASUREMENT
-
-zcl_fhydAttr_t g_zcl_fhydAttrs = {
-        .value = 0.001014,
-};
-
-
-const zclAttrInfo_t fhyd_attrTbl[] = {
-        { ZCL_FHYD_MEASUREMENT_ATTRID_MEASUREDVALUE,     ZCL_SINGLE, RR, (uint8_t*)&g_zcl_fhydAttrs.value             },
-        { ZCL_FHYD_MEASUREMENT_ATTRID_MINMEASUREDVALUE,  ZCL_SINGLE, R,  (uint8_t*)&g_zcl_fhydAttrs.min               },
-        { ZCL_FHYD_MEASUREMENT_ATTRID_MAXMEASUREDVALUE,  ZCL_SINGLE, R,  (uint8_t*)&g_zcl_fhydAttrs.max               },
-
-        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision  },
-};
-
-#define ZCL_FHYD_ATTR_NUM   sizeof(fhyd_attrTbl) / sizeof(zclAttrInfo_t)
-
-#endif
 
 bool calibrateOnOff = false;
 
@@ -245,15 +215,14 @@ const zclAttrInfo_t onOff_attrTbl[] =
  *  @brief Definition for simple switch ZCL specific cluster
  */
 const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
-    {ZCL_CLUSTER_GEN_BASIC,     MANUFACTURER_CODE_NONE, ARRAY_SIZE(basic_attrTbl), basic_attrTbl,      zcl_basic_register,     app_basicCb},
-    {ZCL_CLUSTER_GEN_IDENTIFY,  MANUFACTURER_CODE_NONE, ZCL_IDENTIFY_ATTR_NUM,  identify_attrTbl,   zcl_identify_register,  app_identifyCb},
-    {ZCL_CLUSTER_GEN_GROUPS,    MANUFACTURER_CODE_NONE, ZCL_GROUP_1ATTR_NUM,    group_attr1Tbl,     zcl_group_register,     NULL},
-    {ZCL_CLUSTER_GEN_SCENES,    MANUFACTURER_CODE_NONE, ZCL_SCENE_1ATTR_NUM,    scene_attr1Tbl,     zcl_scene_register,     app_sceneCb},
-    {ZCL_CLUSTER_MS_CO2_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_CO2_ATTR_NUM,  co2_attrTbl,    zcl_co2_measurement_register,   app_co2Cb},
-    {ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_TEMPERATURE_ATTR_NUM,  temperature_attrTbl,    zcl_temperature_measurement_register,   app_temperatureCb},
-    {ZCL_CLUSTER_MS_RELATIVE_HUMIDITY, MANUFACTURER_CODE_NONE, ZCL_HUMIDITY_ATTR_NUM,  humidity_attrTbl,    zcl_humidity_measurement_register,   app_humidityCb},
-    {ZCL_CLUSTER_MS_FHYD_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_FHYD_ATTR_NUM,  fhyd_attrTbl,    zcl_fhyd_measurement_register,   app_fhydCb},
-    {ZCL_CLUSTER_GEN_ON_OFF, MANUFACTURER_CODE_NONE, ARRAY_SIZE(onOff_attrTbl), onOff_attrTbl, zcl_onOff_register, app_onOffCb},
+    {ZCL_CLUSTER_GEN_BASIC,                  MANUFACTURER_CODE_NONE, ARRAY_SIZE(      basic_attrTbl),       basic_attrTbl,                   zcl_basic_register,         app_basicCb },
+    {ZCL_CLUSTER_GEN_IDENTIFY,               MANUFACTURER_CODE_NONE, ARRAY_SIZE(   identify_attrTbl),    identify_attrTbl,                zcl_identify_register,      app_identifyCb },
+    {ZCL_CLUSTER_GEN_GROUPS,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(     group_attr1Tbl),      group_attr1Tbl,                   zcl_group_register,                NULL },
+    {ZCL_CLUSTER_GEN_SCENES,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(     scene_attr1Tbl),      scene_attr1Tbl,                   zcl_scene_register,         app_sceneCb },
+    {ZCL_CLUSTER_MS_CO2_MEASUREMENT,         MANUFACTURER_CODE_NONE, ARRAY_SIZE(        co2_attrTbl),         co2_attrTbl,         zcl_co2_measurement_register,           app_co2Cb },
+    {ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, MANUFACTURER_CODE_NONE, ARRAY_SIZE(temperature_attrTbl), temperature_attrTbl, zcl_temperature_measurement_register,   app_temperatureCb },
+    {ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,       MANUFACTURER_CODE_NONE,    ARRAY_SIZE(humidity_attrTbl),    humidity_attrTbl,    zcl_humidity_measurement_register,      app_humidityCb },
+    {ZCL_CLUSTER_GEN_ON_OFF,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(      onOff_attrTbl),       onOff_attrTbl,                   zcl_onOff_register,         app_onOffCb },
 };
 
 EndpointInfo* get_endpoints() {

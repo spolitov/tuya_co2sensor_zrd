@@ -995,19 +995,13 @@ status_t app_pollCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
 }
 #endif	/* ZCL_POLL_CTRL */
 
-#ifdef ZCL_CO2_MEASUREMENT
-
 status_t app_co2Cb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
-
 //    printf("app_co2Cb(). pAddrInfo->dirCluster: %0x%x, cmdId: 0x%x\r\n", pAddrInfo->dirCluster, cmdId);
 
-    status_t status = ZCL_STA_SUCCESS;
+  status_t status = ZCL_STA_SUCCESS;
 
-    return status;
+  return status;
 }
-
-
-#endif /* ZCL_CO2_MEASUREMENT */
 
 /*********************************************************************
  * @fn      app_temperatureCb
@@ -1045,31 +1039,4 @@ status_t app_humidityCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
 
     return ZCL_STA_SUCCESS;
 }
-
-#ifdef ZCL_FHYD_MEASUREMENT
-
-status_t app_fhydCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
-
-//    printf("app_fhydCb(). pAddrInfo->dirCluster: %0x%x, cmdId: 0x%x\r\n", pAddrInfo->dirCluster, cmdId);
-
-    status_t status = ZCL_STA_SUCCESS;
-
-    return status;
-}
-
-
-#endif /* ZCL_FHYD_MEASUREMENT */
-
-#ifdef ZCL_ANALOG_INPUT
-
-status_t app_aInputCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
-
-//    printf("app_aInputCb(). pAddrInfo->dirCluster: %0x%x, cmdId: 0x%x\r\n", pAddrInfo->dirCluster, cmdId);
-
-    status_t status = ZCL_STA_SUCCESS;
-
-    return status;
-}
-
-#endif /* ZCL_ANALOG_INPUT */
 

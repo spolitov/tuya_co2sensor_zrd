@@ -30,8 +30,6 @@ typedef enum {
     UART_TX_TOO_LONG,
 } uartTx_err;
 
-extern uint8_t uart_msg_err;
-
 void app_uart_init();
 uint32_t get_uart_baudrate();
 void set_uart_baudrate(uint32_t baudrate);

@@ -10,7 +10,6 @@ $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_relative_humidity_measurement.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl/zcl_analog_input.o \
 $(OUT_PATH)/$(SRC_PATH)/app_tuya_datapoint.o \
 $(OUT_PATH)/$(SRC_PATH)/app_uart_tuya.o \
-$(OUT_PATH)/$(SRC_PATH)/app_uart.o \
 $(OUT_PATH)/$(SRC_PATH)/app_co2sensor.o \
 $(OUT_PATH)/$(SRC_PATH)/app_co2sensor_model1.o \
 $(OUT_PATH)/$(SRC_PATH)/app_co2sensor_model2.o \
