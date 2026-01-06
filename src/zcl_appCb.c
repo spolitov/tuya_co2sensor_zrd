@@ -423,15 +423,6 @@ static void app_zcltriggerCmdHandler(zcl_triggerEffect_t *pTriggerEffect)
  */
 static void app_zclIdentifyQueryRspCmdHandler(u8 endpoint, u16 srcAddr, zcl_identifyRspCmd_t *identifyRsp)
 {
-#if FIND_AND_BIND_SUPPORT
-	if(identifyRsp->timeout){
-		findBindDst_t dstInfo;
-		dstInfo.addr = srcAddr;
-		dstInfo.endpoint = endpoint;
-
-		bdb_addIdentifyActiveEpForFB(dstInfo);
-	}
-#endif
 }
 
 /*********************************************************************
@@ -461,10 +452,6 @@ status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPay
 					break;
 				default:
 					break;
-			}
-		}else{
-			if(cmdId == ZCL_CMD_IDENTIFY_QUERY_RSP){
-				app_zclIdentifyQueryRspCmdHandler(pAddrInfo->dstEp, pAddrInfo->srcAddr, (zcl_identifyRspCmd_t *)cmdPayload);
 			}
 		}
 	}

@@ -276,14 +276,19 @@ void user_app_init() {
 }
 
 int zigbee_bound() {
-  return zb_getLocalShortAddr() < 0xFFF8;
+  return zb_isDeviceJoinedNwk();
 }
 
+extern int join_in_progress();
+
 int desired_led_state() {
-  if (zigbee_bound()) {
-    return reset_timer_started();
+  if (reset_timer_started()) {
+    return 1;
   }
-  if (clock_time_exceed(led_switch_time, MS_TO_US(500))) {
+  if (zigbee_bound()) {
+    return 0;
+  }
+  if (clock_time_exceed(led_switch_time, (join_in_progress() || led_state) ? MS_TO_US(500) : MS_TO_US(5000))) {
     return !led_state;
   }
   return led_state;
