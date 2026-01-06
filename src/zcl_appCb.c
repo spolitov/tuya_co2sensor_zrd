@@ -46,18 +46,18 @@
  * LOCAL FUNCTIONS
  */
 #ifdef ZCL_READ
-static void app_zclReadRspCmd(uint16_t clusterId, zclReadRspCmd_t *pReadRspCmd);
+static void app_zclReadRspCmd(u16 clusterId, zclReadRspCmd_t *pReadRspCmd);
 #endif
 #ifdef ZCL_WRITE
-static void app_zclWriteRspCmd(uint16_t clusterId, zclWriteRspCmd_t *pWriteRspCmd);
-static void app_zclWriteReqCmd(uint8_t endPoint, uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd);
+static void app_zclWriteRspCmd(u16 clusterId, zclWriteRspCmd_t *pWriteRspCmd);
+static void app_zclWriteReqCmd(u8 endPoint, u16 clusterId, zclWriteCmd_t *pWriteReqCmd);
 #endif
 #ifdef ZCL_REPORT
-static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgReportCmd_t *pCfgReportCmd);
-static void app_zclCfgReportRspCmd(uint16_t clusterId, zclCfgReportRspCmd_t *pCfgReportRspCmd);
-static void app_zclReportCmd(uint16_t clusterId, zclReportCmd_t *pReportCmd);
+static void app_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *pCfgReportCmd);
+static void app_zclCfgReportRspCmd(u16 clusterId, zclCfgReportRspCmd_t *pCfgReportRspCmd);
+static void app_zclReportCmd(u16 clusterId, zclReportCmd_t *pReportCmd);
 #endif
-static void app_zclDfltRspCmd(uint16_t clusterId, zclDefaultRspCmd_t *pDftRspCmd);
+static void app_zclDfltRspCmd(u16 clusterId, zclDefaultRspCmd_t *pDftRspCmd);
 
 
 /**********************************************************************
@@ -89,8 +89,8 @@ void app_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg)
 {
 //    printf("app_zclProcessIncomingMsg(). hdr.cmd: 0x%x\r\n", pInHdlrMsg->hdr.cmd);
 
-	uint16_t cluster = pInHdlrMsg->msg->indInfo.cluster_id;
-	uint8_t endPoint = pInHdlrMsg->msg->indInfo.dst_ep;
+	u16 cluster = pInHdlrMsg->msg->indInfo.cluster_id;
+	u8 endPoint = pInHdlrMsg->msg->indInfo.dst_ep;
 	switch(pInHdlrMsg->hdr.cmd)
 	{
 #ifdef ZCL_READ
@@ -135,23 +135,23 @@ void app_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg)
  *
  * @return  None
  */
-static void app_zclReadRspCmd(uint16_t clusterId, zclReadRspCmd_t *pReadRspCmd)
+static void app_zclReadRspCmd(u16 clusterId, zclReadRspCmd_t *pReadRspCmd)
 {
 //    printf("app_zclReadRspCmd\n");
-    uint8_t numAttr = pReadRspCmd->numAttr;
+    u8 numAttr = pReadRspCmd->numAttr;
 //    zclReadRspStatus_t *attrList = pReadRspCmd->attrList;
 
-//    uint32_t utc;
-//    uint32_t time_local;
+//    u32 utc;
+//    u32 time_local;
 //    bool time_sent = false;
 
-    for (uint8_t i = 0; i < numAttr; i++) {
+    for (u8 i = 0; i < numAttr; i++) {
 //        if (attrList[i].attrID == ZCL_ATTRID_TIME && attrList[i].status == ZCL_STA_SUCCESS) {
 //            utc = attrList[i].data[0] & 0xff;
 //            utc |= (attrList[i].data[1] << 8)  & 0x0000ffff;
 //            utc |= (attrList[i].data[2] << 16) & 0x00ffffff;
 //            utc |= (attrList[i].data[3] << 24) & 0xffffffff;
-//            zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_TIME, (uint8_t*)&utc);
+//            zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_TIME, (u8*)&utc);
 //            time_sent = true;
 //#if UART_PRINTF_MODE && DEBUG_TIME
 //            printf("Sync UTC:        %d\r\n", utc+UNIX_TIME_CONST);
@@ -161,7 +161,7 @@ static void app_zclReadRspCmd(uint16_t clusterId, zclReadRspCmd_t *pReadRspCmd)
 //            time_local |= (attrList[i].data[1] << 8)  & 0x0000ffff;
 //            time_local |= (attrList[i].data[2] << 16) & 0x00ffffff;
 //            time_local |= (attrList[i].data[3] << 24) & 0xffffffff;
-//            zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_LOCAL_TIME, (uint8_t*)&time_local);
+//            zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_LOCAL_TIME, (u8*)&time_local);
 //            time_sent = true;
 //#if UART_PRINTF_MODE && DEBUG_TIME
 //            printf("Sync Local Time: %d\r\n", time_local+UNIX_TIME_CONST);
@@ -185,7 +185,7 @@ static void app_zclReadRspCmd(uint16_t clusterId, zclReadRspCmd_t *pReadRspCmd)
  *
  * @return  None
  */
-static void app_zclWriteRspCmd(uint16_t clusterId, zclWriteRspCmd_t *pWriteRspCmd)
+static void app_zclWriteRspCmd(u16 clusterId, zclWriteRspCmd_t *pWriteRspCmd)
 {
 //    printf("app_zclWriteRspCmd\r\n");
 
@@ -200,8 +200,8 @@ static void app_zclWriteRspCmd(uint16_t clusterId, zclWriteRspCmd_t *pWriteRspCm
  *
  * @return  None
  */
-static void app_zclWriteReqCmd(uint8_t endPoint, uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd) {
-//    uint8_t numAttr = pWriteReqCmd->numAttr;
+static void app_zclWriteReqCmd(u8 endPoint, u16 clusterId, zclWriteCmd_t *pWriteReqCmd) {
+//    u8 numAttr = pWriteReqCmd->numAttr;
 //    zclWriteRec_t *attr = pWriteReqCmd->attrList;
 
 
@@ -209,7 +209,7 @@ static void app_zclWriteReqCmd(uint8_t endPoint, uint16_t clusterId, zclWriteCmd
 
 #ifdef ZCL_POLL_CTRL
 	if(clusterId == ZCL_CLUSTER_GEN_POLL_CONTROL){
-		for(int32_t i = 0; i < numAttr; i++){
+		for(s32 i = 0; i < numAttr; i++){
 			if(attr[i].attrID == ZCL_ATTRID_CHK_IN_INTERVAL){
 				app_zclCheckInStart();
 				return;
@@ -231,7 +231,7 @@ static void app_zclWriteReqCmd(uint8_t endPoint, uint16_t clusterId, zclWriteCmd
  *
  * @return  None
  */
-static void app_zclDfltRspCmd(uint16_t clusterId, zclDefaultRspCmd_t *pDftRspCmd)
+static void app_zclDfltRspCmd(u16 clusterId, zclDefaultRspCmd_t *pDftRspCmd)
 {
 //    printf("app_zclDfltRspCmd\r\n");
 
@@ -248,12 +248,12 @@ static void app_zclDfltRspCmd(uint16_t clusterId, zclDefaultRspCmd_t *pDftRspCmd
  *
  * @return  None
  */
-static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgReportCmd_t *pCfgReportCmd)
+static void app_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *pCfgReportCmd)
 {
     //printf("app_zclCfgReportCmd\r\n");
 //    reportCfgInfo_t *pEntry;
-//    for(uint8_t i = 0; i < pCfgReportCmd->numAttr; i++) {
-//        for (uint8_t ii = 0; ii < ZCL_REPORTING_TABLE_NUM; ii++) {
+//    for(u8 i = 0; i < pCfgReportCmd->numAttr; i++) {
+//        for (u8 ii = 0; ii < ZCL_REPORTING_TABLE_NUM; ii++) {
 //            pEntry = &reportingTab.reportCfgInfo[ii];
 //            if (pEntry->used) {
 //                printf("attrId: 0x%x, maxInterval: %d, minInterval: %d\r\n", pEntry->attrID, pEntry->maxInterval, pEntry->minInterval);
@@ -283,7 +283,7 @@ static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgRepo
  *
  * @return  None
  */
-static void app_zclCfgReportRspCmd(uint16_t clusterId, zclCfgReportRspCmd_t *pCfgReportRspCmd)
+static void app_zclCfgReportRspCmd(u16 clusterId, zclCfgReportRspCmd_t *pCfgReportRspCmd)
 {
     //printf("app_zclCfgReportRspCmd\r\n");
 
@@ -298,7 +298,7 @@ static void app_zclCfgReportRspCmd(uint16_t clusterId, zclCfgReportRspCmd_t *pCf
  *
  * @return  None
  */
-static void app_zclReportCmd(uint16_t clusterId, zclReportCmd_t *pReportCmd)
+static void app_zclReportCmd(u16 clusterId, zclReportCmd_t *pReportCmd)
 {
     //printf("app_zclReportCmd\n");
 
@@ -317,7 +317,7 @@ static void app_zclReportCmd(uint16_t clusterId, zclReportCmd_t *pReportCmd)
  *
  * @return  status_t
  */
-status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
+status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 {
 	if(cmdId == ZCL_CMD_BASIC_RESET_FAC_DEFAULT){
 		//Reset all the attributes of all its clusters to factory defaults
@@ -329,7 +329,7 @@ status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdP
 #endif	/* ZCL_BASIC */
 
 #ifdef ZCL_IDENTIFY
-int32_t app_zclIdentifyTimerCb(void *arg)
+s32 app_zclIdentifyTimerCb(void *arg)
 {
 	if(g_zcl_identifyAttrs.identifyTime <= 0){
 		identifyTimerEvt = NULL;
@@ -357,7 +357,7 @@ void app_zclIdentifyTimerStop(void)
  *
  * @return  None
  */
-void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime)
+void app_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime)
 {
 	g_zcl_identifyAttrs.identifyTime = identifyTime;
 
@@ -383,8 +383,8 @@ void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t iden
  */
 static void app_zcltriggerCmdHandler(zcl_triggerEffect_t *pTriggerEffect)
 {
-	uint8_t effectId = pTriggerEffect->effectId;
-	//uint8_t effectVariant = pTriggerEffect->effectVariant;
+	u8 effectId = pTriggerEffect->effectId;
+	//u8 effectVariant = pTriggerEffect->effectVariant;
 
 	switch(effectId){
 		case IDENTIFY_EFFECT_BLINK:
@@ -421,7 +421,7 @@ static void app_zcltriggerCmdHandler(zcl_triggerEffect_t *pTriggerEffect)
  *
  * @return  None
  */
-static void app_zclIdentifyQueryRspCmdHandler(uint8_t endpoint, uint16_t srcAddr, zcl_identifyRspCmd_t *identifyRsp)
+static void app_zclIdentifyQueryRspCmdHandler(u8 endpoint, u16 srcAddr, zcl_identifyRspCmd_t *identifyRsp)
 {
 #if FIND_AND_BIND_SUPPORT
 	if(identifyRsp->timeout){
@@ -445,7 +445,7 @@ static void app_zclIdentifyQueryRspCmdHandler(uint8_t endpoint, uint16_t srcAddr
  *
  * @return  status_t
  */
-status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
+status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 {
 
 //    printf("app_identifyCb()\r\n");
@@ -483,7 +483,7 @@ status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
  *
  * @return  None
  */
-static void leak_zclIasZoneEnrollRspCmdHandler(zoneEnrollRsp_t *pZoneEnrollRsp, uint8_t endpoint) {
+static void leak_zclIasZoneEnrollRspCmdHandler(zoneEnrollRsp_t *pZoneEnrollRsp, u8 endpoint) {
 
     //printf("zclIasZoneEnrollRspCmdHandler endpoint: %d, code: %d zone_id: %d\r\n", endpoint, pZoneEnrollRsp->code, pZoneEnrollRsp->zoneId);
     if (pZoneEnrollRsp->zoneId != ZCL_ZONE_ID_INVALID) {
@@ -578,7 +578,7 @@ status_t leak_iasZoneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPay
  *
  * @return  status_t
  */
-status_t app_powerCfgCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
+status_t app_powerCfgCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 {
 
     return ZCL_STA_SUCCESS;
@@ -595,7 +595,7 @@ status_t app_powerCfgCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
  *
  * @return  None
  */
-static void app_zclAddGroupRspCmdHandler(uint8_t ep, zcl_addGroupRsp_t *pAddGroupRsp) {
+static void app_zclAddGroupRspCmdHandler(u8 ep, zcl_addGroupRsp_t *pAddGroupRsp) {
 
 //    printf("app_zclAddGroupRspCmdHandler. ep: %d, status: %d, gid: %d\r\n", ep, pAddGroupRsp->status, pAddGroupRsp->groupId);
 }
@@ -653,7 +653,7 @@ static void app_zclGetGroupMembershipRspCmdHandler(zcl_getGroupMembershipRsp_t *
  *
  * @return  status_t
  */
-status_t app_groupCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
+status_t app_groupCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
 
 //    printf("app_groupCb. ep: %d\r\n", pAddrInfo->dstEp);
 
@@ -693,7 +693,7 @@ status_t app_groupCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdP
  *
  * @return  None
  */
-static void app_zclAddSceneRspCmdHandler(uint8_t cmdId, addSceneRsp_t *pAddSceneRsp)
+static void app_zclAddSceneRspCmdHandler(u8 cmdId, addSceneRsp_t *pAddSceneRsp)
 {
 
 }
@@ -708,7 +708,7 @@ static void app_zclAddSceneRspCmdHandler(uint8_t cmdId, addSceneRsp_t *pAddScene
  *
  * @return  None
  */
-static void app_zclViewSceneRspCmdHandler(uint8_t cmdId, viewSceneRsp_t *pViewSceneRsp)
+static void app_zclViewSceneRspCmdHandler(u8 cmdId, viewSceneRsp_t *pViewSceneRsp)
 {
 
 }
@@ -780,7 +780,7 @@ static void app_zclGetSceneMembershipRspCmdHandler(getSceneMemRsp_t *pGetSceneMe
  *
  * @return  status_t
  */
-status_t app_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
+status_t app_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 {
 	if(pAddrInfo->dstEp == APP_ENDPOINT1){
 		if(pAddrInfo->dirCluster == ZCL_FRAME_SERVER_CLIENT_DIR){
@@ -832,7 +832,7 @@ void app_zclCheckInCmdSend(void)
 	zcl_pollCtrl_checkInCmd(APP_ENDPOINT, &dstEpInfo, TRUE);
 }
 
-int32_t app_zclCheckInTimerCb(void *arg)
+s32 app_zclCheckInTimerCb(void *arg)
 {
 	zcl_pollCtrlAttr_t *pPollCtrlAttr = zcl_pollCtrlAttrGet();
 
@@ -866,12 +866,12 @@ void app_zclSetFastPollMode(bool fastPollMode)
 	zcl_pollCtrlAttr_t *pPollCtrlAttr = zcl_pollCtrlAttrGet();
 
 	isFastPollMode = fastPollMode;
-	uint32_t pollRate = fastPollMode ? pPollCtrlAttr->shortPollInterval : pPollCtrlAttr->longPollInterval;
+	u32 pollRate = fastPollMode ? pPollCtrlAttr->shortPollInterval : pPollCtrlAttr->longPollInterval;
 
 	zb_setPollRate(pollRate  * POLL_RATE_QUARTERSECONDS);
 }
 
-int32_t app_zclFastPollTimeoutCb(void *arg)
+s32 app_zclFastPollTimeoutCb(void *arg)
 {
 	app_zclSetFastPollMode(FALSE);
 
@@ -884,7 +884,7 @@ static status_t app_zclPollCtrlChkInRspCmdHandler(zcl_chkInRsp_t *pCmd)
 	zcl_pollCtrlAttr_t *pPollCtrlAttr = zcl_pollCtrlAttrGet();
 
 	if(pCmd->startFastPolling){
-		uint16_t fastPollTimeoutCnt = 0;
+		u16 fastPollTimeoutCnt = 0;
 
 		if(pCmd->fastPollTimeout){
 			if(pCmd->fastPollTimeout > pPollCtrlAttr->fastPollTimeoutMax){
@@ -966,7 +966,7 @@ static status_t app_zclPollCtrlSetShortPollIntervalCmdHandler(zcl_setShortPollIn
  *
  * @return  status_t
  */
-status_t app_pollCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
+status_t app_pollCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
 {
 	status_t status = ZCL_STA_SUCCESS;
 
@@ -995,7 +995,7 @@ status_t app_pollCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
 }
 #endif	/* ZCL_POLL_CTRL */
 
-status_t app_co2Cb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
+status_t app_co2Cb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
 //    printf("app_co2Cb(). pAddrInfo->dirCluster: %0x%x, cmdId: 0x%x\r\n", pAddrInfo->dirCluster, cmdId);
 
   status_t status = ZCL_STA_SUCCESS;
@@ -1014,7 +1014,7 @@ status_t app_co2Cb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPay
  *
  * @return  status_t
  */
-status_t app_temperatureCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
+status_t app_temperatureCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
 
 //    printf("app_tepmeratureCb. cmd: 0x%x\r\n", cmdId);
 
@@ -1033,7 +1033,7 @@ status_t app_temperatureCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void
  *
  * @return  status_t
  */
-status_t app_humidityCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
+status_t app_humidityCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
 
 //    printf("app_humidityCb. cmd: 0x%x\r\n", cmdId);
 

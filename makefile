@@ -1,5 +1,5 @@
 # Set Project Name
-PROJECT_NAME := tuya_co2sensor_zrd
+PROJECT_NAME := mahtan_co2
 
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM5
@@ -196,7 +196,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
 	@echo 'Create zigbee Tuya OTA file'
-	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-tuya_co2sensor_zrd.zigbee $(BIN_FILE) $(BOOT_FILE)
+	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-$(PROJECT_NAME).zigbee $(BIN_FILE) $(BOOT_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '

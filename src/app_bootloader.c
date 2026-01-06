@@ -4,17 +4,17 @@
 
 void bootloader_check() {
 
-    uint8_t  marker[11] = BOOTLOAD_MARKER;
-    uint8_t  buff[10] = {0};
-    uint8_t  bootloader_buff[BUFF_SIZE] = {0};
-    uint32_t bootloader_offset = 0;
-    uint32_t bootloader_addr = BOOTLOADER_ADDR;
-    uint32_t image_ota_addr = IMAGE_OTA_ADDR1;
+    u8  marker[11] = BOOTLOAD_MARKER;
+    u8  buff[10] = {0};
+    u8  bootloader_buff[BUFF_SIZE] = {0};
+    u32 bootloader_offset = 0;
+    u32 bootloader_addr = BOOTLOADER_ADDR;
+    u32 image_ota_addr = IMAGE_OTA_ADDR1;
 
 
     tl_header_t fw_header, boot_header;
 
-    for (uint8_t i = 0; i < 5; i++) {
+    for (u8 i = 0; i < 5; i++) {
         flash_read_page(BOOTLOAD_MARKER_ADDR, marker[0], buff);
 
         if (memcmp(buff, marker+1, marker[0]) == 0) {
@@ -25,8 +25,8 @@ void bootloader_check() {
         }
     }
 
-    for (uint8_t i = 0; i < 5; i++) {
-        flash_read_page(bootloader_addr, sizeof(tl_header_t), (uint8_t*)&boot_header);
+    for (u8 i = 0; i < 5; i++) {
+        flash_read_page(bootloader_addr, sizeof(tl_header_t), (u8*)&boot_header);
 
         if (boot_header.manuf_code == SLACKY_MANUF_CODE || boot_header.manuf_code == TELINK_MANUF_CODE) {
     #if UART_PRINTF_MODE
@@ -41,7 +41,7 @@ void bootloader_check() {
     printf("Tuya bootloader\r\n");
 #endif
 
-    flash_read_page(image_ota_addr, sizeof(tl_header_t), (uint8_t*)&fw_header);
+    flash_read_page(image_ota_addr, sizeof(tl_header_t), (u8*)&fw_header);
 
     if (fw_header.bin_size > IMAGE_OTA_SIZE || memcmp(fw_header.magic, TL_MAGIC, 4) || fw_header.sig != TL_SIG) {
 #if UART_PRINTF_MODE
@@ -49,7 +49,7 @@ void bootloader_check() {
 #endif
         image_ota_addr = IMAGE_OTA_ADDR2;
 
-        flash_read_page(image_ota_addr, sizeof(tl_header_t), (uint8_t*)&fw_header);
+        flash_read_page(image_ota_addr, sizeof(tl_header_t), (u8*)&fw_header);
 
         if (fw_header.bin_size > IMAGE_OTA_SIZE || memcmp(fw_header.magic, TL_MAGIC, 4) || fw_header.sig != TL_SIG) {
 #if UART_PRINTF_MODE
@@ -59,7 +59,7 @@ void bootloader_check() {
         }
     }
 
-    flash_read_page(image_ota_addr+fw_header.bin_size, sizeof(tl_header_t), (uint8_t*)&boot_header);
+    flash_read_page(image_ota_addr+fw_header.bin_size, sizeof(tl_header_t), (u8*)&boot_header);
 
 //    printf("fw_size: 0x%x, boot_size: 0x%x, boot_size: %d\r\n", fw_header.bin_size, boot_header.bin_size, BOOT_SIZE);
 
@@ -75,9 +75,9 @@ void bootloader_check() {
 
     bootloader_offset = image_ota_addr + fw_header.bin_size;
 
-    uint8_t read_buff[BUFF_SIZE];
+    u8 read_buff[BUFF_SIZE];
 
-    for (uint32_t i = 0; i < boot_header.bin_size; i += BUFF_SIZE) {
+    for (u32 i = 0; i < boot_header.bin_size; i += BUFF_SIZE) {
         if (i % FLASH_SECTOR_SIZE == 0) {
 //            printf("erase_addr: 0x%x\r\n", i);
             flash_erase(bootloader_addr + i);
@@ -94,7 +94,7 @@ void bootloader_check() {
         }
     }
 
-    for (uint8_t i = 0; i < 10; i++) {
+    for (u8 i = 0; i < 10; i++) {
         flash_erase(BOOTLOAD_MARKER_SECTOR);
         flash_read(0, BUFF_SIZE, bootloader_buff);
 
@@ -114,9 +114,9 @@ void bootloader_check() {
     printf("Bootloader is overwritten. Reset\r\n");
 #endif
 
-    uint32_t erase_size = IMAGE_OTA_ADDR_END - image_ota_addr;
+    u32 erase_size = IMAGE_OTA_ADDR_END - image_ota_addr;
 
-    for (uint32_t i = 0; i < erase_size; i += FLASH_SECTOR_SIZE) {
+    for (u32 i = 0; i < erase_size; i += FLASH_SECTOR_SIZE) {
 //        printf("erase_addr: 0x%x\r\n", image_ota_addr + i);
         flash_erase(image_ota_addr + i);
     }

@@ -12,35 +12,22 @@
 #define RR              ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE
 #define RWR             ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_REPORTABLE
 
-#define ZCL_UINT8       ZCL_DATA_TYPE_UINT8
-#define ZCL_INT8        ZCL_DATA_TYPE_INT8
-#define ZCL_UINT16      ZCL_DATA_TYPE_UINT16
-#define ZCL_INT16       ZCL_DATA_TYPE_INT16
-#define ZCL_UINT32      ZCL_DATA_TYPE_UINT32
-#define ZCL_ENUM8       ZCL_DATA_TYPE_ENUM8
-#define ZCL_BOOLEAN     ZCL_DATA_TYPE_BOOLEAN
-#define ZCL_BITMAP8     ZCL_DATA_TYPE_BITMAP8
-#define ZCL_BITMAP16    ZCL_DATA_TYPE_BITMAP16
-#define ZCL_CHAR_STR    ZCL_DATA_TYPE_CHAR_STR
-#define ZCL_UTC         ZCL_DATA_TYPE_UTC
-#define ZCL_SINGLE      ZCL_DATA_TYPE_SINGLE_PREC
-
 /**
  *  @brief Defined for basic cluster attributes
  */
 typedef struct {
-  uint8_t  zclVersion;
-  uint8_t  appVersion;
-  uint8_t  stackVersion;
-  uint8_t  hwVersion;
-  uint8_t  manuName[ZCL_BASIC_MAX_LENGTH];
-  uint8_t  modelId[ZCL_BASIC_MAX_LENGTH];
-  uint8_t  dateCode[ZCL_BASIC_MAX_LENGTH];
-  uint8_t  powerSource;
-  uint8_t  genDevClass;                        //attr 8
-  uint8_t  genDevType;                         //attr 9
-  uint8_t  deviceEnable;
-  uint8_t  swBuildId[ZCL_BASIC_MAX_LENGTH];    //attr 4000
+  u8  zclVersion;
+  u8  appVersion;
+  u8  stackVersion;
+  u8  hwVersion;
+  u8  manuName[ZCL_BASIC_MAX_LENGTH];
+  u8  modelId[ZCL_BASIC_MAX_LENGTH];
+  u8  dateCode[ZCL_BASIC_MAX_LENGTH];
+  u8  powerSource;
+  u8  genDevClass;                        //attr 8
+  u8  genDevType;                         //attr 9
+  u8  deviceEnable;
+  u8  swBuildId[ZCL_BASIC_MAX_LENGTH];    //attr 4000
 } zcl_basicAttr_t;
 
 typedef struct{
@@ -56,25 +43,24 @@ typedef struct{
 } zcl_sceneAttr_t;
 
 typedef struct {
-  int16_t value;
+  s16 value;
 } zcl_temperatureAttr_t;
 
 typedef struct {
-  int16_t value;
+  s16 value;
 } zcl_humidityAttr_t;
 
-const uint16_t app_ep1_inClusterList[] = {
+const u16 app_ep1_inClusterList[] = {
   ZCL_CLUSTER_GEN_BASIC,
   ZCL_CLUSTER_GEN_IDENTIFY,
   ZCL_CLUSTER_GEN_GROUPS,
   ZCL_CLUSTER_GEN_SCENES,
-  ZCL_CLUSTER_GEN_ON_OFF,
   ZCL_CLUSTER_MS_CO2_MEASUREMENT,
   ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
   ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,
 };
 
-const uint16_t app_ep1_outClusterList[] = {
+const u16 app_ep1_outClusterList[] = {
   ZCL_CLUSTER_OTA,
 };
 
@@ -86,8 +72,8 @@ const af_simple_descriptor_t app_ep1Desc = {
   .reserved = 0,
   .app_in_cluster_count = ARRAY_SIZE(app_ep1_inClusterList),
   .app_out_cluster_count = ARRAY_SIZE(app_ep1_outClusterList),
-  .app_in_cluster_lst = (uint16_t*)app_ep1_inClusterList,
-  .app_out_cluster_lst = (uint16_t*)app_ep1_outClusterList,
+  .app_in_cluster_lst = (u16*)app_ep1_inClusterList,
+  .app_out_cluster_lst = (u16*)app_ep1_outClusterList,
 };
 
 void InitZclString(u8* buffer, const char* input) {
@@ -110,18 +96,18 @@ zcl_basicAttr_t g_zcl_basicAttrs = {
 };
 
 const zclAttrInfo_t basic_attrTbl[] = {
-    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.zclVersion  },
-    { ZCL_ATTRID_BASIC_APP_VER,             ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.appVersion  },
-    { ZCL_ATTRID_BASIC_STACK_VER,           ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.stackVersion},
-    { ZCL_ATTRID_BASIC_HW_VER,              ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.hwVersion   },
-    { ZCL_ATTRID_BASIC_MFR_NAME,            ZCL_CHAR_STR,   R,  (uint8_t*)g_zcl_basicAttrs.manuName     },
-    { ZCL_ATTRID_BASIC_MODEL_ID,            ZCL_CHAR_STR,   R,  (uint8_t*)g_zcl_basicAttrs.modelId      },
-    { ZCL_ATTRID_BASIC_DATE_CODE,           ZCL_CHAR_STR,   R,  (uint8_t*)g_zcl_basicAttrs.dateCode     },
-    { ZCL_ATTRID_BASIC_POWER_SOURCE,        ZCL_ENUM8,      R,  (uint8_t*)&g_zcl_basicAttrs.powerSource },
-    { ZCL_ATTRID_BASIC_DEV_ENABLED,         ZCL_BOOLEAN,    RW, (uint8_t*)&g_zcl_basicAttrs.deviceEnable},
-    { ZCL_ATTRID_BASIC_SW_BUILD_ID,         ZCL_CHAR_STR,   R,  (uint8_t*)&g_zcl_basicAttrs.swBuildId   },
+    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_DATA_TYPE_UINT8,      R,  (u8*)&g_zcl_basicAttrs.zclVersion  },
+    { ZCL_ATTRID_BASIC_APP_VER,             ZCL_DATA_TYPE_UINT8,      R,  (u8*)&g_zcl_basicAttrs.appVersion  },
+    { ZCL_ATTRID_BASIC_STACK_VER,           ZCL_DATA_TYPE_UINT8,      R,  (u8*)&g_zcl_basicAttrs.stackVersion},
+    { ZCL_ATTRID_BASIC_HW_VER,              ZCL_DATA_TYPE_UINT8,      R,  (u8*)&g_zcl_basicAttrs.hwVersion   },
+    { ZCL_ATTRID_BASIC_MFR_NAME,            ZCL_DATA_TYPE_CHAR_STR,   R,  (u8*)g_zcl_basicAttrs.manuName     },
+    { ZCL_ATTRID_BASIC_MODEL_ID,            ZCL_DATA_TYPE_CHAR_STR,   R,  (u8*)g_zcl_basicAttrs.modelId      },
+    { ZCL_ATTRID_BASIC_DATE_CODE,           ZCL_DATA_TYPE_CHAR_STR,   R,  (u8*)g_zcl_basicAttrs.dateCode     },
+    { ZCL_ATTRID_BASIC_POWER_SOURCE,        ZCL_DATA_TYPE_ENUM8,      R,  (u8*)&g_zcl_basicAttrs.powerSource },
+    { ZCL_ATTRID_BASIC_DEV_ENABLED,         ZCL_DATA_TYPE_BOOLEAN,    RW, (u8*)&g_zcl_basicAttrs.deviceEnable},
+    { ZCL_ATTRID_BASIC_SW_BUILD_ID,         ZCL_DATA_TYPE_CHAR_STR,   R,  (u8*)&g_zcl_basicAttrs.swBuildId   },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,     R,  (u8*)&zcl_attr_global_clusterRevision},
 
 };
 
@@ -133,9 +119,9 @@ zcl_identifyAttr_t g_zcl_identifyAttrs =
 
 const zclAttrInfo_t identify_attrTbl[] =
 {
-    { ZCL_ATTRID_IDENTIFY_TIME,             ZCL_UINT16,     RW, (uint8_t*)&g_zcl_identifyAttrs.identifyTime},
+    { ZCL_ATTRID_IDENTIFY_TIME,             ZCL_DATA_TYPE_UINT16,     RW, (u8*)&g_zcl_identifyAttrs.identifyTime},
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,     R,  (u8*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_IDENTIFY_ATTR_NUM           sizeof(identify_attrTbl) / sizeof(zclAttrInfo_t)
@@ -149,9 +135,9 @@ zcl_groupAttr_t g_zcl_group1Attrs =
 
 const zclAttrInfo_t group_attr1Tbl[] =
 {
-    { ZCL_ATTRID_GROUP_NAME_SUPPORT,        ZCL_BITMAP8,    R,  (uint8_t*)&g_zcl_group1Attrs.nameSupport},
+    { ZCL_ATTRID_GROUP_NAME_SUPPORT,        ZCL_DATA_TYPE_BITMAP8,    R,  (u8*)&g_zcl_group1Attrs.nameSupport},
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,     R,  (u8*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_GROUP_1ATTR_NUM    sizeof(group_attr1Tbl) / sizeof(zclAttrInfo_t)
@@ -169,13 +155,13 @@ zcl_sceneAttr_t g_zcl_scene1Attrs = {
 };
 
 const zclAttrInfo_t scene_attr1Tbl[] = {
-    { ZCL_ATTRID_SCENE_SCENE_COUNT,         ZCL_UINT8,      R,  (uint8_t*)&g_zcl_scene1Attrs.sceneCount   },
-    { ZCL_ATTRID_SCENE_CURRENT_SCENE,       ZCL_UINT8,      R,  (uint8_t*)&g_zcl_scene1Attrs.currentScene },
-    { ZCL_ATTRID_SCENE_CURRENT_GROUP,       ZCL_UINT16,     R,  (uint8_t*)&g_zcl_scene1Attrs.currentGroup },
-    { ZCL_ATTRID_SCENE_SCENE_VALID,         ZCL_BOOLEAN,    R,  (uint8_t*)&g_zcl_scene1Attrs.sceneValid   },
-    { ZCL_ATTRID_SCENE_NAME_SUPPORT,        ZCL_BITMAP8,    R,  (uint8_t*)&g_zcl_scene1Attrs.nameSupport  },
+    { ZCL_ATTRID_SCENE_SCENE_COUNT,         ZCL_DATA_TYPE_UINT8,      R,  (u8*)&g_zcl_scene1Attrs.sceneCount   },
+    { ZCL_ATTRID_SCENE_CURRENT_SCENE,       ZCL_DATA_TYPE_UINT8,      R,  (u8*)&g_zcl_scene1Attrs.currentScene },
+    { ZCL_ATTRID_SCENE_CURRENT_GROUP,       ZCL_DATA_TYPE_UINT16,     R,  (u8*)&g_zcl_scene1Attrs.currentGroup },
+    { ZCL_ATTRID_SCENE_SCENE_VALID,         ZCL_DATA_TYPE_BOOLEAN,    R,  (u8*)&g_zcl_scene1Attrs.sceneValid   },
+    { ZCL_ATTRID_SCENE_NAME_SUPPORT,        ZCL_DATA_TYPE_BITMAP8,    R,  (u8*)&g_zcl_scene1Attrs.nameSupport  },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,  (uint8_t*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,     R,  (u8*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_SCENE_1ATTR_NUM   sizeof(scene_attr1Tbl) / sizeof(zclAttrInfo_t)
@@ -184,31 +170,27 @@ const zclAttrInfo_t scene_attr1Tbl[] = {
 
 AppAttributes attributes = {
   .co2 = 0.001014,
+  .co2_calibration_value = 600,
+  .co2_last_calibration = 0xffffffff,
   .temperature = 0x8000,
   .humidity = 0xffff,
 };
 
 const zclAttrInfo_t co2_attrTbl[] = {
-  { ZCL_CO2_MEASUREMENT_ATTRID_MEASUREDVALUE, ZCL_SINGLE, RR, (uint8_t*)&attributes.co2 },
-  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,       ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision },
+  { ZCL_CO2_MEASUREMENT_ATTRID_MEASUREDVALUE,     ZCL_DATA_TYPE_SINGLE_PREC, RR, (u8*)&attributes.co2 },
+  { ZCL_CO2_MEASUREMENT_ATTRID_CALIBRATION_VALUE,      ZCL_DATA_TYPE_UINT16, RW, (u8*)&attributes.co2_calibration_value },
+  { ZCL_CO2_MEASUREMENT_ATTRID_LAST_CALIBRATION,          ZCL_DATA_TYPE_UTC, RR, (u8*)&attributes.co2_last_calibration },
+  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,                ZCL_DATA_TYPE_UINT16,  R, (u8*)&zcl_attr_global_clusterRevision },
 };
 
 const zclAttrInfo_t temperature_attrTbl[] = {
-  { ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE, ZCL_INT16, RR, (uint8_t*)&attributes.temperature },
-  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,               ZCL_UINT16, R, (uint8_t*)&zcl_attr_global_clusterRevision },
+  { ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE, ZCL_DATA_TYPE_INT16, RR, (u8*)&attributes.temperature },
+  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,               ZCL_DATA_TYPE_UINT16, R, (u8*)&zcl_attr_global_clusterRevision },
 };
 
 const zclAttrInfo_t humidity_attrTbl[] = {
-  { ZCL_ATTRID_HUMIDITY_MEASUREDVALUE,  ZCL_UINT16, RR, (uint8_t*)&attributes.humidity },
-  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_UINT16, R,  (uint8_t*)&zcl_attr_global_clusterRevision },
-};
-
-bool calibrateOnOff = false;
-
-const zclAttrInfo_t onOff_attrTbl[] =
-{
-	{ ZCL_ATTRID_ONOFF, ZCL_DATA_TYPE_BOOLEAN, RR, (u8*)&calibrateOnOff},
-	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16, R, (u8*)&zcl_attr_global_clusterRevision},
+  { ZCL_ATTRID_HUMIDITY_MEASUREDVALUE,  ZCL_DATA_TYPE_UINT16, RR, (u8*)&attributes.humidity },
+  { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16, R,  (u8*)&zcl_attr_global_clusterRevision },
 };
 
 /**
@@ -222,8 +204,9 @@ const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
     {ZCL_CLUSTER_MS_CO2_MEASUREMENT,         MANUFACTURER_CODE_NONE, ARRAY_SIZE(        co2_attrTbl),         co2_attrTbl,         zcl_co2_measurement_register,           app_co2Cb },
     {ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, MANUFACTURER_CODE_NONE, ARRAY_SIZE(temperature_attrTbl), temperature_attrTbl, zcl_temperature_measurement_register,   app_temperatureCb },
     {ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,       MANUFACTURER_CODE_NONE,    ARRAY_SIZE(humidity_attrTbl),    humidity_attrTbl,    zcl_humidity_measurement_register,      app_humidityCb },
-    {ZCL_CLUSTER_GEN_ON_OFF,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(      onOff_attrTbl),       onOff_attrTbl,                   zcl_onOff_register,         app_onOffCb },
 };
+
+bool calibrateOnOff = false;
 
 EndpointInfo* get_endpoints() {
   InitZclString(g_zcl_basicAttrs.modelId, "Mahtan_CO2_DIY");

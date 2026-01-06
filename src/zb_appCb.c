@@ -45,9 +45,9 @@
 /**********************************************************************
  * LOCAL FUNCTIONS
  */
-void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork);
-void zb_bdbCommissioningCb(uint8_t status, void *arg);
-void zb_bdbIdentifyCb(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime);
+void zb_bdbInitCb(u8 status, u8 joinedNetwork);
+void zb_bdbCommissioningCb(u8 status, void *arg);
+void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime);
 void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo);
 
 
@@ -73,14 +73,14 @@ ev_timer_event_t *switchRejoinBackoffTimerEvt = NULL;
 /**********************************************************************
  * FUNCTIONS
  */
-int32_t app_bdbNetworkSteerStart(void *arg) {
+s32 app_bdbNetworkSteerStart(void *arg) {
     bdb_networkSteerStart();
 
     return -1;
 }
 
 #if FIND_AND_BIND_SUPPORT
-int32_t app_bdbFindAndBindStart(void *arg) {
+s32 app_bdbFindAndBindStart(void *arg) {
     BDB_ATTR_GROUP_ID_SET(0x1234);//only for initiator
     bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_INITIATOR);
 
@@ -89,7 +89,7 @@ int32_t app_bdbFindAndBindStart(void *arg) {
 }
 #endif
 
-int32_t app_rejoinBacckoff(void *arg) {
+s32 app_rejoinBacckoff(void *arg) {
     if (zb_isDeviceFactoryNew()) {
         switchRejoinBackoffTimerEvt = NULL;
         return -1;
@@ -110,7 +110,7 @@ int32_t app_rejoinBacckoff(void *arg) {
  *
  * @return  None
  */
-void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork) {
+void zb_bdbInitCb(u8 status, u8 joinedNetwork) {
 //    printf("bdbInitCb: sta = %x, joined = %x\r\n", status, joinedNetwork);
 
     if (status == BDB_INIT_STATUS_SUCCESS) {
@@ -123,7 +123,6 @@ void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork) {
          *
          */
         if (joinedNetwork) {
-            set_status_net(STATUS_NET_CONNECTED);
             zb_setPollRate(POLL_RATE * 3);
 #ifdef ZCL_OTA
             ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
@@ -133,8 +132,7 @@ void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork) {
 			app_zclCheckInStart();
 #endif
         } else {
-            set_status_net(STATUS_NET_FREE);
-            uint16_t jitter = 0;
+            u16 jitter = 0;
             do {
                 jitter = zb_random() % 0x0fff;
             } while (jitter == 0);
@@ -169,7 +167,7 @@ BDB_COMMISSION_STA_FORMATION_DONE,
 */
 
 #if UART_PRINTF_MODE && DEBUG_STA_STATUS
-const static uint8_t bdb_commission_sta_status[][64] = {
+const static u8 bdb_commission_sta_status[][64] = {
         "BDB_COMMISSION_STA_SUCCESS",
         "BDB_COMMISSION_STA_IN_PROGRESS",
         "BDB_COMMISSION_STA_NOT_AA_CAPABLE",
@@ -198,14 +196,13 @@ const static uint8_t bdb_commission_sta_status[][64] = {
  *
  * @return  None
  */
-void zb_bdbCommissioningCb(uint8_t status, void *arg) {
+void zb_bdbCommissioningCb(u8 status, void *arg) {
 //    printf("zb_bdbCommissioningCb: sta = %x\r\n", status);
 
-    uint16_t jitter = 0;
+    u16 jitter = 0;
 
     switch (status) {
         case BDB_COMMISSION_STA_SUCCESS:
-            set_status_net(STATUS_NET_CONNECTED);
             zb_setPollRate(POLL_RATE * 3);
 
             if(steerTimerEvt){
@@ -233,7 +230,6 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg) {
 			}
 			break;
         case BDB_COMMISSION_STA_IN_PROGRESS:
-            set_status_net(STATUS_NET_IN_PROGRESS);
             break;
         case BDB_COMMISSION_STA_NOT_AA_CAPABLE:
             break;
@@ -290,8 +286,8 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg) {
 }
 
 
-extern void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime);
-void zb_bdbIdentifyCb(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime){
+extern void app_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
+void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
 #if FIND_AND_BIND_SUPPORT
 	app_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
 #endif
@@ -332,7 +328,7 @@ void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo){
 //    /* reset update OTA */
 //    nv_resetModule(NV_MODULE_OTA);
 //
-//    memset((uint8_t*) &otaClientInfo, 0, sizeof(otaClientInfo));
+//    memset((u8*) &otaClientInfo, 0, sizeof(otaClientInfo));
 //    otaClientInfo.clientOtaFlg = OTA_FLAG_INIT_DONE;
 //    otaClientInfo.crcValue = 0xffffffff;
 //
@@ -341,7 +337,7 @@ void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo){
 //    zcl_attr_downloadFileVer = 0xffffffff;
 //}
 
-void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
+void app_otaProcessMsgHandler(u8 evt, u8 status) {
     //printf("app_otaProcessMsgHandler: status = %x\r\n", status);
 
     if(evt == OTA_EVT_START){

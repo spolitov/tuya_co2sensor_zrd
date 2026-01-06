@@ -18,17 +18,17 @@
 #define TL_SIG                  0x025D
 
 typedef struct {
-    uint16_t reset;
-    uint32_t file_version;
-    uint16_t sig;
-    uint8_t  magic[4];
-    uint32_t addr_bin_code;
-    uint16_t irq;
-    uint16_t manuf_code;
-    uint16_t image_type;
-    uint16_t dummy1;
-    uint32_t bin_size;
-    uint32_t dummy2;
+    u16 reset;
+    u32 file_version;
+    u16 sig;
+    u8  magic[4];
+    u32 addr_bin_code;
+    u16 irq;
+    u16 manuf_code;
+    u16 image_type;
+    u16 dummy1;
+    u32 bin_size;
+    u32 dummy2;
 } tl_header_t;
 
 void bootloader_check();

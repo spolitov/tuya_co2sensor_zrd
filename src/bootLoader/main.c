@@ -41,7 +41,7 @@ int main(void){
 	bootloader_init(isBoot);
 
 #if VOLTAGE_DETECT_ENABLE
-    uint32_t tick = clock_time();
+    u32 tick = clock_time();
 #endif
 
 	while(1){

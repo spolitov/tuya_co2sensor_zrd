@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#include "app_types.h"
+#include "types.h"
 
 #define ON                      1
 #define OFF                     0
@@ -105,57 +105,14 @@ extern "C" {
 #define BOARD_TUYA_ZT3L                 10
 
 /* Board define */
-#if defined(MCU_CORE_826x)
-#if !PA_ENABLE
-    #define BOARD                       BOARD_826x_DONGLE
-#else
-    #define BOARD                       BOARD_826x_DONGLE_PA
-#endif
-    #define CLOCK_SYS_CLOCK_HZ          32000000
-#elif defined(MCU_CORE_8258)
 #if (CHIP_TYPE == TLSR_8258_1M)
-    #define FLASH_CAP_SIZE_1M           1
+#define FLASH_CAP_SIZE_1M           1
 #endif
-    #define BOARD                       BOARD_TUYA_ZT3L
-    #define CLOCK_SYS_CLOCK_HZ          48000000
-    #define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
-#elif defined(MCU_CORE_8278)
-    #define FLASH_CAP_SIZE_1M           1
-    #define BOARD                       BOARD_8278_DONGLE//BOARD_8278_EVK
-    #define CLOCK_SYS_CLOCK_HZ          48000000
-#elif defined(MCU_CORE_B91)
-    #define FLASH_CAP_SIZE_1M           1
-    #define BOARD                       BOARD_B91_DONGLE//BOARD_B91_EVK
-    #define CLOCK_SYS_CLOCK_HZ          48000000
-#else
-    #error "MCU is undefined!"
-#endif
+#define BOARD                       BOARD_TUYA_ZT3L
+#define CLOCK_SYS_CLOCK_HZ          48000000
+#define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
 
-/* Board include */
-#if (BOARD == BOARD_826x_EVK)
-    #include "board_826x_evk.h"
-#elif (BOARD == BOARD_826x_DONGLE)
-    #include "board_826x_dongle.h"
-#elif (BOARD == BOARD_826x_DONGLE_PA)
-    #include "board_826x_dongle_pa.h"
-#elif (BOARD == BOARD_8258_DONGLE)
-    #include "board_8258_dongle.h"
-#elif (BOARD == BOARD_8258_EVK)
-    #include "board_8258_evk.h"
-#elif (BOARD == BOARD_8258_EVK_V1P2)
-    #include "board_8258_evk_v1p2.h"
-#elif (BOARD == BOARD_8278_EVK)
-    #include "board_8278_evk.h"
-#elif (BOARD == BOARD_8278_DONGLE)
-    #include "board_8278_dongle.h"
-#elif (BOARD == BOARD_B91_EVK)
-    #include "board_b91_evk.h"
-#elif (BOARD == BOARD_B91_DONGLE)
-    #include "board_b91_dongle.h"
-#elif (BOARD == BOARD_TUYA_ZT3L)
-    #include "board_tuya.h"
-#endif
-
+#include "board_zt3l.h"
 
 /* Voltage detect module */
 /* If VOLTAGE_DETECT_ENABLE is set,
@@ -169,14 +126,7 @@ extern "C" {
  */
 #define VOLTAGE_DETECT_ENABLE						OFF
 
-#if defined(MCU_CORE_826x)
-    #define VOLTAGE_DETECT_ADC_PIN                  0
-#elif defined(MCU_CORE_8258) || defined(MCU_CORE_8278)
-    #define VOLTAGE_DETECT_ADC_PIN                  GPIO_PC4
-#elif defined(MCU_CORE_B91)
-    #define VOLTAGE_DETECT_ADC_PIN                  ADC_GPIO_PB0
-#endif
-
+#define VOLTAGE_DETECT_ADC_PIN                  GPIO_PC4
 
 /* Watch dog module */
 #define MODULE_WATCHDOG_ENABLE						ON
@@ -203,6 +153,7 @@ extern "C" {
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 #endif
 #define ZCL_ON_OFF_SUPPORT                          ON
+#define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               ON
 
 /**********************************************************************
  * Stack configuration
@@ -216,7 +167,7 @@ extern "C" {
 typedef enum{
 	EV_POLL_ED_DETECT,
 	EV_POLL_HCI,
-    EV_POLL_IDLE,
+  EV_POLL_IDLE,
 	EV_POLL_MAX,
 }ev_poll_e;
 

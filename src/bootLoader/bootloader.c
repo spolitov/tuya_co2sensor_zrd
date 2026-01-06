@@ -245,7 +245,7 @@ void bootloader_ota_check_Stop(void){
 }
 
 #if UART_ENABLE
-u8 crc8Calc(uint16_t type, uint16_t len, u8 *data){
+u8 crc8Calc(u16 type, u16 len, u8 *data){
 	u8 crc8;
 
 	crc8  = (type >> 0) & 0xff;
@@ -253,14 +253,14 @@ u8 crc8Calc(uint16_t type, uint16_t len, u8 *data){
 	crc8 ^= (len >> 0) & 0xff;
 	crc8 ^= (len >> 8) & 0xff;
 
-	for(uint16_t i = 0; i < len; i++){
+	for(u16 i = 0; i < len; i++){
 		crc8 ^= data[i];
 	}
 
 	return crc8;
 }
 
-void bootloader_uartTx(uint16_t type, uint16_t len, u8 *data){
+void bootloader_uartTx(u16 type, u16 len, u8 *data){
     u8 crc8 = crc8Calc(type, len, data);
 
     u8 *pData = uartTxBuf;
@@ -271,7 +271,7 @@ void bootloader_uartTx(uint16_t type, uint16_t len, u8 *data){
     *pData++ = (len >> 8) & 0xff;
     *pData++ = (len >> 0) & 0xff;
     *pData++ = crc8;
-    for(uint16_t i = 0; i < len; i++){
+    for(u16 i = 0; i < len; i++){
         *pData++ = data[i];
     }
     *pData++ = MSG_END_FLAG;
@@ -279,7 +279,7 @@ void bootloader_uartTx(uint16_t type, uint16_t len, u8 *data){
     drv_uart_tx_start(uartTxBuf, pData - uartTxBuf);
 }
 
-void bootloader_uartAck(uint16_t type, u8 status){
+void bootloader_uartAck(u16 type, u8 status){
 	u8 array[4] = {0};
 
 	array[0] = (type >> 8) & 0xff;
@@ -374,7 +374,7 @@ s32 upgradeBlockReqTimerCb(void *arg){
 	}
 }
 
-void bootloader_upgrade(uint16_t type, uint16_t len, u8 *data){
+void bootloader_upgrade(u16 type, u16 len, u8 *data){
 	u8 sta = MSG_STA_SUCCESS;
 	u8 *pData = data;
 
@@ -487,8 +487,8 @@ void bootloader_uartRxDataProc(void){
 		uart_msg_t *pMsg = (uart_msg_t *)buf;
 
 		u8 sta = MSG_STA_SUCCESS;
-		uint16_t msgType = 0xffff;
-		uint16_t msgLen = 0;
+		u16 msgType = 0xffff;
+		u16 msgLen = 0;
 
 		if(pMsg->startFlag == MSG_START_FLAG){
 			msgType = (pMsg->msgType16H << 8) + pMsg->msgType16L;
