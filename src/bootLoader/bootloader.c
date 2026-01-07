@@ -228,10 +228,8 @@ s32 otaChkDelayCb(void *arg){
 }
 
 void bootloader_ota_check_delay(u32 delayMs){
-	if(delayMs){
-		if(otaChkTimerEvt){
-			TL_ZB_TIMER_CANCEL(&otaChkTimerEvt);
-		}
+	if (delayMs) {
+    TL_ZB_TIMER_CANCEL(&otaChkTimerEvt);
 		otaChkTimerEvt = TL_ZB_TIMER_SCHEDULE(otaChkDelayCb, NULL, delayMs);
 	}else{
 		bootloader_with_ota_check(APP_RUNNING_ADDR, APP_NEW_IMAGE_ADDR);
@@ -239,9 +237,7 @@ void bootloader_ota_check_delay(u32 delayMs){
 }
 
 void bootloader_ota_check_Stop(void){
-	if(otaChkTimerEvt){
-		TL_ZB_TIMER_CANCEL(&otaChkTimerEvt);
-	}
+	TL_ZB_TIMER_CANCEL(&otaChkTimerEvt);
 }
 
 #if UART_ENABLE
@@ -352,10 +348,8 @@ void bootloader_uartBlockReq(void){
 void bootloader_uartOtaComplete(u8 status){
 	bootloader_uartOtaEnd(status);
 
-	if(upgradeInfo.upgradeTimer){
-		TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
-	}
-	memset((u8 *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
+	TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
+	memset(&upgradeInfo, 0, sizeof(upgradeInfo_t));
 }
 
 s32 upgradeBlockReqTimerCb(void *arg){
@@ -400,12 +394,8 @@ void bootloader_upgrade(u16 type, u16 len, u8 *data){
 						flash_erase(APP_NEW_IMAGE_ADDR + i * 4096);
 					}
 
-					if(upgradeInfo.upgradeTimer){
-						TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
-					}
-					upgradeInfo.upgradeTimer = TL_ZB_TIMER_SCHEDULE(upgradeBlockReqTimerCb,
-																	NULL,
-																	MSG_BLOCK_REQUEST_INTERVAL);
+					TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
+					upgradeInfo.upgradeTimer = TL_ZB_TIMER_SCHEDULE(upgradeBlockReqTimerCb, NULL, MSG_BLOCK_REQUEST_INTERVAL);
 				}else{
 					sta = MSG_STA_OTA_FILE_OVERSIZE;
 				}
@@ -417,9 +407,7 @@ void bootloader_upgrade(u16 type, u16 len, u8 *data){
 			break;
 		case MSG_CMD_OTA_BLOCK_RESPONSE:
 			{
-				if(upgradeInfo.upgradeTimer){
-					TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
-				}
+				TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
 
 				u8 rspStatus = *pData++;
 

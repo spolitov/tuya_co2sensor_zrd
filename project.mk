@@ -2,11 +2,12 @@
 OUT_DIR += /$(SRC_PATH)
 
 OBJS += \
-$(OUT_PATH)/$(SRC_PATH)/app_endpoint_cfg.o \
 $(OUT_PATH)/$(SRC_PATH)/app_bootloader.o \
+$(OUT_PATH)/$(SRC_PATH)/app_endpoint_cfg.o \
 $(OUT_PATH)/$(SRC_PATH)/app_main.o \
+$(OUT_PATH)/$(SRC_PATH)/app_utility.o \
+$(OUT_PATH)/$(SRC_PATH)/app_zb.o \
 $(OUT_PATH)/$(SRC_PATH)/app_zcl.o \
-$(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl_appCb.o
 
 # Each subdirectory must supply rules for building sources it contributes

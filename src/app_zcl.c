@@ -1,6 +1,6 @@
 #include "app_zcl.h"
 
-#include "zcl.h"
+#include "zcl_include.h"
 
 #include "app_endpoint_cfg.h"
 

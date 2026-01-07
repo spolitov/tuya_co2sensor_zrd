@@ -2,7 +2,7 @@
 PROJECT_NAME := mahtan_co2
 
 # Set the serial port number for downloading the firmware
-DOWNLOAD_PORT := COM5
+DOWNLOAD_PORT := COM6
 
 COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
 
@@ -63,6 +63,7 @@ GCC_FLAGS := \
 -ffunction-sections \
 -fdata-sections \
 -Wall \
+-Werror \
 -O2 \
 -fpack-struct \
 -fshort-enums \
