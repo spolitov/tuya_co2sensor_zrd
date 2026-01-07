@@ -1,25 +1,26 @@
-#include "app_main.h"
+#include "app_cfg.h"
+#include "zb_common.h"
+#include "zcl_include.h"
+#include "gp.h"
+
+#include "app_endpoint_cfg.h"
+#include "app_utility.h"
+#include "app_zcl.h"
 
 #define PIN_LED GPIO_PB4
 #define PIN_BUTTON GPIO_PA0
 
-app_ctx_t g_appCtx = {
-  .bdbFBTimerEvt = NULL,
-  .short_poll    = POLL_RATE * 3,
-  .long_poll     = POLL_RATE * LONG_POLL,
-};
+static u32 button_press_time = 0;
+static unsigned long led_switch_time = 0;
+static int led_state = 0;
+static ev_timer_event_t* factory_reset_timer = NULL;
 
-u32 button_press_time = 0;
-unsigned long led_switch_time = 0;
-int led_state = 0;
-ev_timer_event_t* factory_reset_timer = NULL;
+static u8 uart_data[0x200];
+static u32 last_calibration_request_time = 0;
 
-u8 uart_data[0x200];
-u32 last_calibration_request_time = 0;
-
-reportCfgInfo_t* co2_report_cfg = NULL;
-publish_info_t co2_last_calibration_publish_info;
-unsigned long co2_measurement_time = 0;
+static reportCfgInfo_t* co2_report_cfg = NULL;
+static publish_info_t co2_last_calibration_publish_info;
+static unsigned long co2_measurement_time = 0;
 
 void button_release();
 
@@ -137,17 +138,25 @@ int zigbee_bound() {
 
 extern int join_in_progress();
 
+int handle_led_blink(u32 interval) {
+  if (clock_time_exceed(led_switch_time, interval)) {
+    return !led_state;
+  }
+  return led_state;
+}
+
 int desired_led_state() {
   if (reset_timer_started()) {
     return 1;
   }
   if (zigbee_bound()) {
+    if (g_zcl_identifyAttrs.time > 0) {
+      return handle_led_blink(MS_TO_US(500));
+    }
+
     return 0;
   }
-  if (clock_time_exceed(led_switch_time, (join_in_progress() || led_state) ? MS_TO_US(250) : MS_TO_US(2500))) {
-    return !led_state;
-  }
-  return led_state;
+  return handle_led_blink((join_in_progress() || led_state) ? MS_TO_US(250) : MS_TO_US(2500));
 }
 
 void update_led() {

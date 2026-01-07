@@ -1,4 +1,8 @@
-#include "app_main.h"
+#include "app_bootloader.h"
+
+#include "platform.h"
+#include "string.h"
+#include "tl_common.h"
 
 #define BUFF_SIZE   256
 

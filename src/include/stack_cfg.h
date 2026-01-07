@@ -25,74 +25,15 @@
 
 #pragma once
 
-#if ZCL_THERMOSTAT_UI_CFG_SUPPORT
-#define ZCL_THERMOSTAT_UI_CFG
-#endif
-
-
-/**
- *  @brief Definition for timer event
- */
-//#define TIMER_EVENT_NUM                         (48)
-
-
-/**
- *  @brief  Working channel
- *          Valid value: 11 ~ 26
- */
 #define DEFAULT_CHANNEL                         20
-
-/**
- *  @brief  NVRAM
- */
 #define NV_ENABLE                               1
-
-/**
- *  @brief  Security
- */
 #define SECURITY_ENABLE							1
-
-
-/**********************************************************************
- * Following parameter need user to adjust according the app requirement
- */
-/**
- *  @brief  ZCL: MAX number of cluster list, in cluster number add  + out cluster number
- *
- */
 #define	ZCL_CLUSTER_NUM_MAX						16
-
-/**
- *  @brief  ZCL: maximum number for zcl reporting table
- *
- */
 #define ZCL_REPORTING_TABLE_NUM					24
-
-/**
- *  @brief  ZCL: maximum number for zcl scene table
- *
- */
 #define	ZCL_SCENE_TABLE_NUM						8
-
-/**
- *  @brief  APS: MAX number of groups size in the group table
- *          In each group entry, there is 8 endpoints existed.
- */
 #define APS_GROUP_TABLE_NUM                   	8
-
-/**
- *  @brief  APS: MAX number of binding table size
- */
 #define APS_BINDING_TABLE_NUM                 	32
 
-
-/**********************************************************************
- * Following configuration will calculated automatically
- */
-
-/**
-   Auto definition for the role
- */
 #if (COORDINATOR)
     #define ZB_ROUTER_ROLE                        1
     #define ZB_COORDINATOR_ROLE                   1
@@ -103,9 +44,6 @@
 #endif
 
 
-/***********************************************************************
- * If PM_ENABLE is set, the macro ZB_MAC_RX_ON_WHEN_IDLE must be ZERO.
- */
 #if ZB_ED_ROLE
 	#if PM_ENABLE
 		#define ZB_MAC_RX_ON_WHEN_IDLE			  0//must 0
@@ -115,4 +53,3 @@
 		#define ZB_MAC_RX_ON_WHEN_IDLE			  1//set 0 or 1
 	#endif
 #endif
-

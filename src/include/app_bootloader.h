@@ -1,6 +1,9 @@
 #ifndef SRC_INCLUDE_APP_BOOTLOADER_H_
 #define SRC_INCLUDE_APP_BOOTLOADER_H_
 
+#include "app_cfg.h"
+#include "types.h"
+
 #define BOOTLOADER_ADDR         BOOT_LOADER_IMAGE_ADDR
 #define IMAGE_OTA_ADDR1         0x70000
 #define IMAGE_OTA_ADDR2         FLASH_ADDR_OF_OTA_IMAGE

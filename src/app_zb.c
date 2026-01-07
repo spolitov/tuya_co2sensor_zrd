@@ -2,7 +2,17 @@
 #include "zcl_include.h"
 #include "ota.h"
 
-#include "app_main.h"
+#include "app_endpoint_cfg.h"
+#include "app_utility.h"
+#include "app_zcl.h"
+
+typedef struct {
+    u8 keyType; /* CERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network
+                        SS_UNIQUE_LINK_KEY or SS_GLOBAL_LINK_KEY for distribute network */
+    u8 key[16]; /* the key used */
+} app_linkKey_info_t;
+
+static app_linkKey_info_t tcLinkKey;
 
 static ota_preamble_t app_otaInfo = {
   .fileVer          = FILE_VERSION,
@@ -160,9 +170,7 @@ bdb_commissionSetting_t bdb_commissionSetting = {
 
 static void default_reporting_cfg(u16 clusterID, u16 attrID, u16 minReportInt, u16 maxReportInt) {
   memset(reportable_change, 0, REPORTABLE_CHANGE_MAX_ANALOG_SIZE);
-  if (bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, clusterID, attrID, minReportInt, maxReportInt, reportable_change) != ZCL_STA_SUCCESS) {
-    sleep_ms(5000);
-  }
+  bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, clusterID, attrID, minReportInt, maxReportInt, reportable_change);
   reportable_change += REPORTABLE_CHANGE_MAX_ANALOG_SIZE;
 }
 
@@ -174,9 +182,9 @@ void app_init_zb() {
 }
 
 void app_init_bdb() {
-  if(bdb_preInstallCodeLoad(&g_appCtx.tcLinkKey.keyType, g_appCtx.tcLinkKey.key) == RET_OK) {
-    bdb_commissionSetting.linkKey.tcLinkKey.keyType = g_appCtx.tcLinkKey.keyType;
-    bdb_commissionSetting.linkKey.tcLinkKey.key = g_appCtx.tcLinkKey.key;
+  if(bdb_preInstallCodeLoad(&tcLinkKey.keyType, tcLinkKey.key) == RET_OK) {
+    bdb_commissionSetting.linkKey.tcLinkKey.keyType = tcLinkKey.keyType;
+    bdb_commissionSetting.linkKey.tcLinkKey.key = tcLinkKey.key;
   }
 
   default_reporting_cfg(ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_MEASUREDVALUE, 10, 300);

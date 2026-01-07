@@ -1,7 +1,10 @@
+#include "app_endpoint_cfg.h"
+
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#include "app_main.h"
+#include "app_utility.h"
+#include "app_zcl.h"
 
 #define ZCL_ATTRID_TEMPERATURE_MEASUREMENT_MEASUREDVALUE ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE
 
@@ -158,17 +161,17 @@ const zclAttrInfo_t scene_attrTbl[] = {
 #undef CLUSTER
 
 zcl_co2Attr_t g_zcl_co2Attrs = {
-  .measured_value = 1014,
+  .measured_value = 1014.0f,
   .calibration_value = 600,
-  .last_calibration = 0xffffffff,
+  .last_calibration = 0,
 };
 
 #define CLUSTER (CO2_MEASUREMENT, co2)
 
 const zclAttrInfo_t co2_attrTbl[] = {
-  ATTRIBUTE(UINT16, RR,     MEASUREDVALUE,    measured_value)
-  ATTRIBUTE(UINT16, RW, CALIBRATION_VALUE, calibration_value)
-  ATTRIBUTE(   UTC, RR,  LAST_CALIBRATION,  last_calibration)
+  ATTRIBUTE(SINGLE_PREC, RR,     MEASUREDVALUE,    measured_value)
+  ATTRIBUTE(     UINT16, RW, CALIBRATION_VALUE, calibration_value)
+  ATTRIBUTE(        UTC, RR,  LAST_CALIBRATION,  last_calibration)
 
   ATTRIBUTE_REVISION
 };
@@ -204,13 +207,13 @@ const zclAttrInfo_t humidity_attrTbl[] = {
 #undef CLUSTER
 
 const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
-    {ZCL_CLUSTER_GEN_BASIC,                  MANUFACTURER_CODE_NONE, ARRAY_SIZE(      basic_attrTbl),       basic_attrTbl,                   zcl_basic_register,                NULL },
-    {ZCL_CLUSTER_GEN_IDENTIFY,               MANUFACTURER_CODE_NONE, ARRAY_SIZE(   identify_attrTbl),    identify_attrTbl,                zcl_identify_register,      app_identifyCb },
-    {ZCL_CLUSTER_GEN_GROUPS,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(      group_attrTbl),       group_attrTbl,                   zcl_group_register,                NULL },
-    {ZCL_CLUSTER_GEN_SCENES,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(      scene_attrTbl),       scene_attrTbl,                   zcl_scene_register,         app_sceneCb },
-    {ZCL_CLUSTER_MS_CO2_MEASUREMENT,         MANUFACTURER_CODE_NONE, ARRAY_SIZE(        co2_attrTbl),         co2_attrTbl,         zcl_co2_measurement_register,           app_co2Cb },
-    {ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, MANUFACTURER_CODE_NONE, ARRAY_SIZE(temperature_attrTbl), temperature_attrTbl, zcl_temperature_measurement_register,   app_temperatureCb },
-    {ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,       MANUFACTURER_CODE_NONE,    ARRAY_SIZE(humidity_attrTbl),    humidity_attrTbl,    zcl_humidity_measurement_register,      app_humidityCb },
+    {ZCL_CLUSTER_GEN_BASIC,                  MANUFACTURER_CODE_NONE, ARRAY_SIZE(      basic_attrTbl),       basic_attrTbl,                   zcl_basic_register,           NULL },
+    {ZCL_CLUSTER_GEN_IDENTIFY,               MANUFACTURER_CODE_NONE, ARRAY_SIZE(   identify_attrTbl),    identify_attrTbl,                zcl_identify_register, app_identifyCb },
+    {ZCL_CLUSTER_GEN_GROUPS,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(      group_attrTbl),       group_attrTbl,                   zcl_group_register,           NULL },
+    {ZCL_CLUSTER_GEN_SCENES,                 MANUFACTURER_CODE_NONE, ARRAY_SIZE(      scene_attrTbl),       scene_attrTbl,                   zcl_scene_register,           NULL },
+    {ZCL_CLUSTER_MS_CO2_MEASUREMENT,         MANUFACTURER_CODE_NONE, ARRAY_SIZE(        co2_attrTbl),         co2_attrTbl,         zcl_co2_measurement_register,           NULL },
+    {ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, MANUFACTURER_CODE_NONE, ARRAY_SIZE(temperature_attrTbl), temperature_attrTbl, zcl_temperature_measurement_register,           NULL },
+    {ZCL_CLUSTER_MS_RELATIVE_HUMIDITY,       MANUFACTURER_CODE_NONE,    ARRAY_SIZE(humidity_attrTbl),    humidity_attrTbl,    zcl_humidity_measurement_register,           NULL },
 };
 
 bool calibrateOnOff = false;

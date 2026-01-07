@@ -2,6 +2,8 @@
 #define SRC_INCLUDE_APP_ENDPOINT_CFG_H_
 
 #include "types.h"
+#include "zb_common.h"
+#include "zcl_include.h"
 
 #define APP_ENDPOINT1 0x01
 
@@ -12,7 +14,7 @@ typedef struct {
 extern zcl_identifyAttr_t g_zcl_identifyAttrs;
 
 typedef struct {
-  u16 measured_value;
+  float measured_value;
   u16 calibration_value;
   u32 last_calibration;
 } zcl_co2Attr_t;
@@ -39,5 +41,7 @@ typedef struct {
 } endpoint_info_t;
 
 endpoint_info_t* get_endpoints();
+
+extern const af_simple_descriptor_t app_ep1Desc;
 
 #endif /* SRC_INCLUDE_APP_ENDPOINT_CFG_H_ */
