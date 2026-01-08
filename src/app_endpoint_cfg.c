@@ -49,10 +49,10 @@ const zcl_specClusterInfo_t g_appEp1ClusterList[] = {
 bool calibrateOnOff = false;
 
 endpoint_info_t* get_endpoints() {
-  init_zcl_string(g_zcl_basicAttrs.manuName, ZCL_BASIC_MFG_NAME);
-  init_zcl_string(g_zcl_basicAttrs.modelId, "Mahtan_CO2_DIY");
-  init_zcl_string(g_zcl_basicAttrs.dateCode, STRINGIFY(BUILD_DATE));
-  init_zcl_string(g_zcl_basicAttrs.swBuildId, "0108012025");
+  init_zcl_string(zcl_basic.manuName, ZCL_BASIC_MFG_NAME);
+  init_zcl_string(zcl_basic.modelId, "Mahtan_CO2_DIY");
+  init_zcl_string(zcl_basic.dateCode, STRINGIFY(BUILD_DATE));
+  init_zcl_string(zcl_basic.swBuildId, "0108012025");
 
   static endpoint_info_t result[] = {
     {

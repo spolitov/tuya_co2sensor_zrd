@@ -17,23 +17,21 @@ inline u16 load_le16(const u8* start) {
   return *start + ((u16)start[1] << 8);
 }
 
-inline void store_be16(u8* out, u16 input) {
-  out[0] = input >> 8;
-  out[1] = input & 0xff;
-}
-
 inline void store_le16(u8* out, u16 input) {
   out[0] = input & 0xff;
   out[1] = input >> 8;
 }
 
-extern void init_zcl_string(u8* buffer, const char* input);
+inline u16 load_be16(const u8* start) {
+  return start[1] + ((u16)start[0] << 8);
+}
 
-#define CAT_II(p, res) res
-#define CAT_I(a, b) CAT_II(~, a ## b)
-#define CAT(a, b) CAT_I(a, b)
-#define CAT3(a, b, c) CAT(CAT(a, b), c)
-#define CAT4(a, b, c, d) CAT(CAT(CAT(a, b), c), d)
+inline void store_be16(u8* out, u16 input) {
+  out[0] = input >> 8;
+  out[1] = input & 0xff;
+}
+
+extern void init_zcl_string(u8* buffer, const char* input);
 
 typedef struct {
   const clusterInfo_t* cluster_info;

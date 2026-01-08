@@ -8,7 +8,7 @@
 #define RWR             ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE | ACCESS_CONTROL_REPORTABLE
 
 #define CLUSTER_ATTRIBUTE(UCLUSTER, LCLUSTER, TYPE, ACCESS, UNAME, LNAME, INITIAL_VALUE) \
-    { CAT4(ZCL_ATTRID_, UCLUSTER, _, UNAME), CAT(ZCL_DATA_TYPE_, TYPE), ACCESS, (u8*)&CAT3(g_zcl_, LCLUSTER, Attrs).LNAME  },
+    { PP_CAT4(ZCL_ATTRID_, UCLUSTER, _, UNAME), PP_CAT(ZCL_DATA_TYPE_, TYPE), ACCESS, (u8*)&PP_CAT(zcl_, LCLUSTER).LNAME  },
 #define ATTRIBUTE_REVISION \
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,     R,  (u8*)&zcl_attr_global_clusterRevision},
 
@@ -31,10 +31,10 @@
   typedef struct { \
     PP_SEQ_FOR_EACH_UNPACK(CLUSTER_FIELD, ATTRIBUTES) \
   } PP_CAT3(zcl_, LNAME, Attr_t); \
-  extern PP_CAT3(zcl_, LNAME, Attr_t) PP_CAT3(g_zcl_, LNAME, Attrs);
+  extern PP_CAT3(zcl_, LNAME, Attr_t) PP_CAT(zcl_, LNAME);
 
 #define DEFINE_CLUSTER(UNAME, LNAME, ATTRIBUTES) \
-  PP_CAT3(zcl_, LNAME, Attr_t) PP_CAT3(g_zcl_, LNAME, Attrs) = { \
+  PP_CAT3(zcl_, LNAME, Attr_t) PP_CAT(zcl_, LNAME) = { \
     PP_SEQ_FOR_EACH_UNPACK(CLUSTER_FIELD_INIT, ATTRIBUTES) \
   }; \
   const zclAttrInfo_t PP_CAT(LNAME, _attrTbl)[] = { \
