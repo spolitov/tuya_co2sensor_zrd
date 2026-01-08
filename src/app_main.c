@@ -198,11 +198,8 @@ static void dht22_read() {
       byte = 0;
     }
   }
-  zcl_co2.last_calibration = 8000000 + clock_time() - read_start;
 
   if ((u8)(bytes[0] + bytes[1] + bytes[2] + bytes[3]) != bytes[4]) {
-    memcpy(&zcl_co2.last_calibration, bytes + 1, 4);
-    zcl_humidity.measured_value = bytes[0];
     return;
   }
 
