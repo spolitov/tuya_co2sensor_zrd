@@ -2,7 +2,7 @@
 PROJECT_NAME := bootloader
 
 # Set the serial port number for downloading the firmware
-DOWNLOAD_PORT := COM5
+DOWNLOAD_PORT := COM6
 
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux

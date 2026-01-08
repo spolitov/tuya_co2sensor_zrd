@@ -7,8 +7,8 @@
 #define BUFF_SIZE   256
 
 void bootloader_check() {
-
-    u8  marker[11] = BOOTLOAD_MARKER;
+    u8  marker[] = BOOTLOAD_MARKER;
+    u8  marker_len = strlen((char*)marker);
     u8  buff[10] = {0};
     u8  bootloader_buff[BUFF_SIZE] = {0};
     u32 bootloader_offset = 0;
@@ -19,9 +19,9 @@ void bootloader_check() {
     tl_header_t fw_header, boot_header;
 
     for (u8 i = 0; i < 5; i++) {
-        flash_read_page(BOOTLOAD_MARKER_ADDR, marker[0], buff);
+        flash_read_page(BOOTLOAD_MARKER_ADDR, marker_len, buff);
 
-        if (memcmp(buff, marker+1, marker[0]) == 0) {
+        if (memcmp(buff, marker, marker_len) == 0) {
 #if UART_PRINTF_MODE
             printf("SDK bootloader\r\n");
 #endif
@@ -102,13 +102,13 @@ void bootloader_check() {
         flash_erase(BOOTLOAD_MARKER_SECTOR);
         flash_read(0, BUFF_SIZE, bootloader_buff);
 
-        flash_write(BOOTLOAD_MARKER_ADDR, marker[0], marker+1);
+        flash_write(BOOTLOAD_MARKER_ADDR, marker_len, marker);
 
         memset(bootloader_buff, 0, BUFF_SIZE);
 
-        flash_read_page(BOOTLOAD_MARKER_ADDR, marker[0], buff);
+        flash_read_page(BOOTLOAD_MARKER_ADDR, marker_len, buff);
 
-        if (memcmp(buff, marker+1, marker[0]) == 0) {
+        if (memcmp(buff, marker, marker_len) == 0) {
 //            printf("i: %d\r\n", i);
             break;
         }

@@ -5,7 +5,6 @@ OUT_DIR += \
 /$(SRC_PATH)/bootloader
 
 OBJS += \
-$(OUT_PATH)/$(SRC_PATH)/common/firmwareEncryptChk.o \
 $(OUT_PATH)/$(SRC_PATH)/bootloader/bootloader.o \
 $(OUT_PATH)/$(SRC_PATH)/bootloader/main.o 
 

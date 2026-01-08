@@ -125,7 +125,7 @@ extern "C" {
 #elif (BOARD == BOARD_B91_DONGLE)
 	#include "board_b91_dongle.h"
 #elif (BOARD == BOARD_TUYA_ZT3L)
-    #include "board_tuya.h"
+  #include "board_zt3l.h"
 #endif
 
 

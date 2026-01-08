@@ -4,34 +4,12 @@
 #include "types.h"
 #include "zb_common.h"
 #include "zcl_include.h"
+#include "cluster_defs.h"
 
 #define APP_ENDPOINT1 0x01
+#define ZCL_ATTRID_TEMPERATURE_MEASUREMENT_MEASUREDVALUE ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE
 
-typedef struct {
-  u16 time;
-} zcl_identifyAttr_t;
-
-extern zcl_identifyAttr_t g_zcl_identifyAttrs;
-
-typedef struct {
-  float measured_value;
-  u16 calibration_value;
-  u32 last_calibration;
-} zcl_co2Attr_t;
-
-extern zcl_co2Attr_t g_zcl_co2Attrs;
-
-typedef struct {
-  s16 measured_value;
-} zcl_temperatureAttr_t;
-
-extern zcl_temperatureAttr_t g_zcl_temperatureAttrs;
-
-typedef struct {
-  u16 measured_value;
-} zcl_humidityAttr_t;
-
-extern zcl_humidityAttr_t g_zcl_humidityAttrs;
+#include "clusters.h"
 
 typedef struct {
   int id;

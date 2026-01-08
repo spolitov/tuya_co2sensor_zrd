@@ -55,7 +55,7 @@ extern "C" {
  * Product Information
  */
 
-#define ZCL_BASIC_MFG_NAME     {10, 'M','a','h','t','a','n','-','D','I','Y'}
+#define ZCL_BASIC_MFG_NAME     "Mahtan-DIY"
 
 /**********************************************************************
  * Version configuration

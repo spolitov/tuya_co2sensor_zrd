@@ -32,7 +32,7 @@ static s32 app_bdbNetworkSteerStart(void *arg) {
   return -1;
 }
 
-static void schedule_join() {
+void schedule_join() {
   u16 jitter = (1 + (zb_random() & 0xf)) * 100;
   ++scheduled_join;
   TL_ZB_TIMER_SCHEDULE(app_bdbNetworkSteerStart, NULL, jitter);

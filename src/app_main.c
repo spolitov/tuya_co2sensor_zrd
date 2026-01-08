@@ -10,7 +10,10 @@
 #define PIN_LED GPIO_PB4
 #define PIN_BUTTON GPIO_PA0
 
-static u32 button_press_time = 0;
+extern int join_in_progress();
+extern void app_init_zb();
+extern void app_init_bdb();
+
 static unsigned long led_switch_time = 0;
 static int led_state = 0;
 static ev_timer_event_t* factory_reset_timer = NULL;
@@ -22,24 +25,18 @@ static reportCfgInfo_t* co2_report_cfg = NULL;
 static publish_info_t co2_last_calibration_publish_info;
 static unsigned long co2_measurement_time = 0;
 
-void button_release();
-
-int factory_reset_trigger(void* arg) {
+static int factory_reset_trigger(void* arg) {
   zb_resetDevice2FN();
   factory_reset_timer = NULL;
   return -1;
 }
 
-void button_press() {
+static void button_press() {
   if (drv_gpio_read(PIN_BUTTON)) {
-    button_press_time = 0;
-
     drv_gpio_irq_set(PIN_BUTTON, GPIO_FALLING_EDGE);
 
     TL_ZB_TIMER_CANCEL(&factory_reset_timer);
   } else {
-    button_press_time = clock_time();
-
     drv_gpio_irq_set(PIN_BUTTON, GPIO_RISING_EDGE);
 
     if (!factory_reset_timer) {
@@ -48,10 +45,7 @@ void button_press() {
   }
 }
 
-void button_release() {
-}
-
-bool reset_timer_started() {
+static bool reset_timer_started() {
   return factory_reset_timer != NULL;
 }
 
@@ -89,13 +83,7 @@ static void uart_recv_cb() {
   }
 }
 
-void user_app_init() {
-#if ZCL_POLL_CTRL_SUPPORT
-  af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_PERIODICALLY);
-#else
-  af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_WHEN_STIMULATED);
-#endif
-
+void init_zcl() {
   zcl_init(NULL);
 
   endpoint_info_t* endpoints = get_endpoints();
@@ -108,15 +96,9 @@ void user_app_init() {
   for (endpoint_info_t* i = endpoints; i->id != 0; ++i) {
     zcl_register(i->id, i->cluster_size, (zcl_specClusterInfo_t*)i->cluster);
   }
+}
 
-  co2_report_cfg = zcl_reportCfgInfoEntryFind(
-      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_MEASUREDVALUE);
-
-  co2_last_calibration_publish_info = obtain_publish_info(
-      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_LAST_CALIBRATION);
-
-  gp_init(APP_ENDPOINT1);
-
+void init_drv() {
   drv_gpio_func_set(PIN_BUTTON);
   drv_gpio_output_en(PIN_BUTTON, 0);
   drv_gpio_input_en(PIN_BUTTON, 1);
@@ -135,8 +117,6 @@ void user_app_init() {
 int zigbee_bound() {
   return zb_isDeviceJoinedNwk();
 }
-
-extern int join_in_progress();
 
 int handle_led_blink(u32 interval) {
   if (clock_time_exceed(led_switch_time, interval)) {
@@ -206,35 +186,11 @@ void app_task() {
 
 extern volatile u16 T_evtExcept[4];
 
-static void appSysException(void) {
-
-#if UART_PRINTF_MODE
-    printf("app_sysException, line: %d, event: %d, reset\r\n", T_evtExcept[0], T_evtExcept[1]);
-#endif
-
-#if 1
-    SYSTEM_RESET();
-#else
-    led_on(LED_STATUS);
-    while(1);
-#endif
+static void app_sys_exception(void) {
+  SYSTEM_RESET();
 }
 
-extern void app_init_zb();
-extern void app_init_bdb();
-
-/*********************************************************************
- * @fn      user_init
- *
- * @brief   User level initialization code.
- *
- * @param   isRetention - if it is waking up with ram retention.
- *
- * @return  None
- */
-void user_init(bool isRetention) {
-  (void)isRetention;
-
+void user_init(bool is_retention) {
   drv_gpio_func_set(PIN_LED);
   drv_gpio_output_en(PIN_LED, 1);
   drv_gpio_input_en(PIN_LED, 0);
@@ -246,12 +202,23 @@ void user_init(bool isRetention) {
 
   app_init_zb();
 
-  user_app_init();
+  af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_WHEN_STIMULATED);
+
+  init_zcl();
+
+  co2_report_cfg = zcl_reportCfgInfoEntryFind(
+      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_MEASUREDVALUE);
+
+  co2_last_calibration_publish_info = obtain_publish_info(
+      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_LAST_CALIBRATION);
+
+  gp_init(APP_ENDPOINT1);
+
+  init_drv();
 
   /* Register except handler for test */
-  sys_exceptHandlerRegister(appSysException);
+  sys_exceptHandlerRegister(app_sys_exception);
 
-  /* User's Task */
 #if ZBHCI_EN
   zbhciInit();
   ev_on_poll(EV_POLL_HCI, zbhciTask);
