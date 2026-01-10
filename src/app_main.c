@@ -87,7 +87,7 @@ static void uart_recv_cb() {
   }
 }
 
-void init_zcl() {
+static void init_zcl() {
   zcl_init(NULL);
 
   endpoint_info_t* endpoints = get_endpoints();
@@ -100,6 +100,18 @@ void init_zcl() {
   for (endpoint_info_t* i = endpoints; i->id != 0; ++i) {
     zcl_register(i->id, i->cluster_size, (zcl_specClusterInfo_t*)i->cluster);
   }
+
+  co2_report_cfg = zcl_reportCfgInfoEntryFind(
+      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_MEASUREDVALUE);
+
+  co2_last_calibration_publish_info = obtain_publish_info(
+      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_LAST_CALIBRATION);
+
+  temp_report_cfg = zcl_reportCfgInfoEntryFind(
+      APP_ENDPOINT1, ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, ZCL_ATTRID_TEMPERATURE_MEASUREMENT_MEASUREDVALUE);
+
+  hum_report_cfg = zcl_reportCfgInfoEntryFind(
+      APP_ENDPOINT1, ZCL_CLUSTER_MS_RELATIVE_HUMIDITY, ZCL_ATTRID_RELATIVE_HUMIDITY_MEASUREDVALUE);
 }
 
 static void init_drv() {
@@ -222,7 +234,7 @@ static int dht22_read_start(void* arg) {
   return -1;
 }
 
-static void update_dht() {
+void update_dht() {
   unsigned int period_sec = 0;
   if (temp_report_cfg && temp_report_cfg->minInterval) {
     period_sec = temp_report_cfg->minInterval;
@@ -272,7 +284,7 @@ void app_task() {
   update_led();
   if (zigbee_bound()) {
     update_co2();
-    update_dht();
+    // update_dht();
   }
 }
 
@@ -297,18 +309,6 @@ void user_init(bool is_retention) {
   af_powerDescPowerModeUpdate(POWER_MODE_RECEIVER_COMES_WHEN_STIMULATED);
 
   init_zcl();
-
-  co2_report_cfg = zcl_reportCfgInfoEntryFind(
-      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_MEASUREDVALUE);
-
-  co2_last_calibration_publish_info = obtain_publish_info(
-      APP_ENDPOINT1, ZCL_CLUSTER_MS_CO2_MEASUREMENT, ZCL_ATTRID_CO2_MEASUREMENT_LAST_CALIBRATION);
-
-  temp_report_cfg = zcl_reportCfgInfoEntryFind(
-      APP_ENDPOINT1, ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, ZCL_ATTRID_TEMPERATURE_MEASUREMENT_MEASUREDVALUE);
-
-  hum_report_cfg = zcl_reportCfgInfoEntryFind(
-      APP_ENDPOINT1, ZCL_CLUSTER_MS_RELATIVE_HUMIDITY, ZCL_ATTRID_RELATIVE_HUMIDITY_MEASUREDVALUE);
 
   gp_init(APP_ENDPOINT1);
 
