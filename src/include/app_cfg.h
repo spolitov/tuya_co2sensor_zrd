@@ -39,58 +39,19 @@ extern "C" {
 #define MCU_CORE_8258   1
 #endif
 
-//#define ZB_DEFAULT_TX_POWER_IDX RF_POWER_P0p04dBm
-#define MY_RF_POWER_INDEX   RF_POWER_N5p03dBm   //RF_POWER_N0p14dBm   //RF_POWER_P0p04dBm   //
-
-
-/* for reporting */
 #define REPORTING_MIN       300             /* 5 min            */
 #define REPORTING_MAX       3600            /* 60 min           */
 
-/* for polling */
-#define LONG_POLL           REPORTING_MIN
-#define TIMEOUT_NET         TIMEOUT_30MIN
-
-/**********************************************************************
- * Product Information
- */
-
 #define ZCL_BASIC_MFG_NAME     "Mahtan-DIY"
 
-/**********************************************************************
- * Version configuration
- */
 #include "version_cfg.h"
 
-/* Debug mode config */
-#define	UART_PRINTF_MODE                OFF
-#define USB_PRINTF_MODE         	    	OFF
-
-#define DEBUG_PKT                       ON
-#define DEBUG_PKT_FILTER                OFF
-#define DEBUG_CMD                       OFF
-#define DEBUG_DP                        OFF
-#define DEBUG_TIME                      OFF
-#define DEBUG_SAVE                      ON
-#define DEBUG_SCHEDULE                  OFF
-#define DEBUG_PM                        OFF
-#define DEBUG_REPORTING                 OFF
-#define DEBUG_OTA                       OFF
-#define DEBUG_STA_STATUS                OFF
-
-/* HCI interface */
+#define	UART_PRINTF_MODE                ON
 #define ZBHCI_UART                      OFF
+#define PM_ENABLE					            	OFF
+#define PA_ENABLE						            OFF
+#define TOUCHLINK_SUPPORT				        ON
 
-/* PM */
-#define PM_ENABLE						OFF
-
-/* PA */
-#define PA_ENABLE						OFF
-
-/* BDB */
-#define TOUCHLINK_SUPPORT				ON
-
-/* Board ID */
 #define BOARD_826x_EVK                  0
 #define BOARD_826x_DONGLE               1
 #define BOARD_826x_DONGLE_PA            2
@@ -113,33 +74,8 @@ extern "C" {
 
 #include "board_zt3l.h"
 
-/* Voltage detect module */
-/* If VOLTAGE_DETECT_ENABLE is set,
- * 1) if MCU_CORE_826x is defined, the DRV_ADC_VBAT_MODE mode is used by default,
- * and there is no need to configure the detection IO port;
- * 2) if MCU_CORE_8258 or MCU_CORE_8278 is defined, the DRV_ADC_VBAT_MODE mode is used by default,
- * we need to configure the detection IO port, and the IO must be in a floating state.
- * 3) if MCU_CORE_B91 is defined, the DRV_ADC_BASE_MODE mode is used by default,
- * we need to configure the detection IO port, and the IO must be connected to the target under test,
- * such as VCC.
- */
-#define VOLTAGE_DETECT_ENABLE						OFF
-
-#define VOLTAGE_DETECT_ADC_PIN                  GPIO_PC4
-
-/* Watch dog module */
 #define MODULE_WATCHDOG_ENABLE						ON
 
-/* UART module */
-#define	MODULE_UART_ENABLE							OFF
-
-#if (ZBHCI_USB_PRINT || ZBHCI_USB_CDC || ZBHCI_USB_HID || ZBHCI_UART)
-	#define ZBHCI_EN								1
-#endif
-
-/**********************************************************************
- * ZCL cluster support setting
- */
 #define ZCL_GROUP_SUPPORT                           ON
 #define ZCL_SCENE_SUPPORT                           ON
 #define ZCL_OTA_SUPPORT                             ON
@@ -148,24 +84,23 @@ extern "C" {
 #define ZCL_TEMPERATURE_MEASUREMENT_SUPPORT         ON
 #define ZCL_HUMIDITY_MEASUREMENT_SUPPORT            ON
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
-#define ZCL_ON_OFF_SUPPORT                          ON
-#define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               ON
 
-/**********************************************************************
- * Stack configuration
- */
 #include "stack_cfg.h"
 
-
-/**********************************************************************
- * EV configuration
- */
 typedef enum{
 	EV_POLL_ED_DETECT,
 	EV_POLL_HCI,
   EV_POLL_IDLE,
 	EV_POLL_MAX,
 }ev_poll_e;
+
+#define LOG_OFF(...) do {} while(false)
+
+#if UART_PRINTF_MODE
+#define LOG_ON(prefix, fmt, ...) do { printf(prefix ": " fmt "\n", ##__VA_ARGS__); } while(false)
+#else
+#define LOG_ON(...) LOG_OFF(__VA_ARGS__)
+#endif
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)

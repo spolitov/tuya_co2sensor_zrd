@@ -41,15 +41,28 @@ static const u8 auchCRCLo[] = {
   0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80, 0x40
 };
 
-u16 modbus_crc(const u8 *dataarray, u16 datalen) {
-  u8 uchCRCHi = 0xFF ; /* CRC High byte initialization*/
-  u8 uchCRCLo = 0xFF ; /* CRC Low byte initialization*/
-  while (datalen--) {
-    u16 uIndex = uchCRCLo ^ *dataarray++;/* count CRC */
+u16 modbus_crc(const u8* data, u32 len) {
+  u8 uchCRCHi = 0xFF;
+  u8 uchCRCLo = 0xFF;
+  while (len--) {
+    u16 uIndex = uchCRCLo ^ *data++;/* count CRC */
     uchCRCLo = uchCRCHi ^ auchCRCHi[uIndex];
     uchCRCHi = auchCRCLo[uIndex];
   }
   return (u16)uchCRCHi * 256 + (u16)uchCRCLo;
+}
+
+u8 sum_crc(const u8* data, u32 len) {
+  u8 result = 0;
+  for (const u8* stop = data + len; data != stop; ++data) {
+    result += *data;
+  }
+  return result;
+}
+
+bool check_sum_crc(const u8* data, u32 len) {
+  --len;
+  return sum_crc(data, len) == data[len];
 }
 
 void init_zcl_string(u8* buffer, const char* input) {

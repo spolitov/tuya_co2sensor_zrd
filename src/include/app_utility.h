@@ -11,7 +11,9 @@
 #define MIN_TO_MS(min) ((min)*60*1000)
 
 #define MODBUS_CRC_LEN 2
-extern u16 modbus_crc(const u8 *dataarray, u16 datalen);
+extern u16 modbus_crc(const u8* data, u32 len);
+extern u8 sum_crc(const u8* data, u32 len);
+extern bool check_sum_crc(const u8* data, u32 len);
 
 inline u16 load_le16(const u8* start) {
   return *start + ((u16)start[1] << 8);
