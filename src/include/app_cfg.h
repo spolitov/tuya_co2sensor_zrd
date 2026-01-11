@@ -46,7 +46,7 @@ extern "C" {
 
 #include "version_cfg.h"
 
-#define	UART_PRINTF_MODE                ON
+#define	UART_PRINTF_MODE                OFF
 #define ZBHCI_UART                      OFF
 #define PM_ENABLE					            	OFF
 #define PA_ENABLE						            OFF
