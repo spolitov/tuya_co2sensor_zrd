@@ -43,4 +43,6 @@ typedef struct {
 extern publish_info_t obtain_publish_info(u8 endpoint, u16 clusterId, u16 attrId);
 extern void publish_attribute(publish_info_t info);
 
+extern bool need_update(const reportCfgInfo_t* report_cfg, u16 default_internval, u16 min_interval, u32* state);
+
 #endif /* SRC_INCLUDE_APP_UTILITY_H_ */

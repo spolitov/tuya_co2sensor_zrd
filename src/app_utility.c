@@ -112,3 +112,15 @@ void publish_attribute(publish_info_t info) {
       info.cluster_info->endpoint, &dstEpInfo, TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
       info.cluster_info->clusterID, (zclReportCmd_t*)&report);
 }
+
+bool need_update(const reportCfgInfo_t* report_cfg, u16 default_internval, u16 min_interval, u32* state) {
+  unsigned int period_sec = report_cfg ? report_cfg->minInterval : default_internval;
+  if (period_sec < min_interval) {
+    period_sec = min_interval;
+  }
+  if (!clock_time_exceed(*state, SEC_TO_US(period_sec))) {
+    return false;
+  }
+  *state = clock_time();
+  return true;
+}

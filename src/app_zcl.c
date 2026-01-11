@@ -11,7 +11,7 @@ _CODE_ZCL_ status_t zcl_humidity_measurement_register(u8 endpoint, u16 manuCode,
   return zcl_registerCluster(endpoint, ZCL_CLUSTER_MS_RELATIVE_HUMIDITY, manuCode, attrNum, attrTbl, NULL, cb);
 }
 
-#define ZCL_CMD_CALIBRATE 0x80
+static const u8 ZCL_CMD_CALIBRATE = 0x80;
 
 static status_t zcl_co2_client_command_handler(zclIncoming_t* msg) {
   if (msg->hdr.cmd != ZCL_CMD_CALIBRATE) {

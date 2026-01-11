@@ -5,6 +5,7 @@ OBJS += \
 $(OUT_PATH)/$(SRC_PATH)/app_bootloader.o \
 $(OUT_PATH)/$(SRC_PATH)/app_co2.o \
 $(OUT_PATH)/$(SRC_PATH)/app_dht22.o \
+$(OUT_PATH)/$(SRC_PATH)/app_ds1820.o \
 $(OUT_PATH)/$(SRC_PATH)/app_endpoint_cfg.o \
 $(OUT_PATH)/$(SRC_PATH)/app_main.o \
 $(OUT_PATH)/$(SRC_PATH)/app_utility.o \

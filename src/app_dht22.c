@@ -7,9 +7,9 @@
 #include "app_utility.h"
 #include "app_zcl.h"
 
-#define PIN_DHT GPIO_PD7
-
 #define LOG_DHT(...) LOG_ON("DHT", __VA_ARGS__)
+
+const u32 PIN_DHT = GPIO_PC2;
 
 static unsigned long dht22_measurement_time = 0;
 static reportCfgInfo_t* temp_report_cfg = NULL;

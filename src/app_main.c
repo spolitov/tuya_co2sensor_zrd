@@ -7,10 +7,10 @@
 #include "app_utility.h"
 #include "app_zcl.h"
 
-#define PIN_LED GPIO_PB4
-#define PIN_BUTTON GPIO_PA0
-
 #define LOG_INIT(...) LOG_ON("INIT", __VA_ARGS__)
+
+static const u32 PIN_LED = GPIO_PB4;
+static const u32 PIN_BUTTON = GPIO_PA0;
 
 extern int join_in_progress();
 extern void app_init_zb();
@@ -19,8 +19,15 @@ extern void app_init_bdb();
 extern void co2_init();
 extern void co2_update();
 
+#if ENABLE_DHT22
 extern void dht22_init();
 extern void dht22_update();
+#endif
+
+#if ENABLE_DS1820
+extern void ds1820_init();
+extern void ds1820_update();
+#endif
 
 static unsigned long led_switch_time = 0;
 static int led_state = 0;
@@ -104,7 +111,12 @@ void app_task() {
   led_update();
   if (zigbee_bound()) {
     co2_update();
+#if ENABLE_DHT22
     dht22_update();
+#endif
+#if ENABLE_DS1820
+    ds1820_update();
+#endif
   }
 }
 
@@ -142,7 +154,12 @@ void user_init(bool is_retention) {
   init_zcl();
 
   co2_init();
+#if ENABLE_DHT22
   dht22_init();
+#endif
+#if ENABLE_DS1820
+  ds1820_init();
+#endif
 
   gp_init(APP_ENDPOINT1);
 

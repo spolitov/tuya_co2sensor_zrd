@@ -85,6 +85,9 @@ extern "C" {
 #define ZCL_HUMIDITY_MEASUREMENT_SUPPORT            ON
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 
+#define ENABLE_DHT22  ON
+#define ENABLE_DS1820 OFF
+
 #include "stack_cfg.h"
 
 typedef enum{

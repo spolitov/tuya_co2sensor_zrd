@@ -14,7 +14,7 @@ static u32 co2_last_calibration_request_time = 0;
 
 static reportCfgInfo_t* co2_report_cfg = NULL;
 static publish_info_t co2_last_calibration_publish_info;
-static unsigned long co2_measurement_time = 0;
+static u32 co2_measurement_time = 0;
 
 static void co2_publish_last_calibration(void* arg) {
   publish_attribute(co2_last_calibration_publish_info);
@@ -78,14 +78,9 @@ void co2_init() {
 }
 
 void co2_update() {
-  unsigned int period_sec = co2_report_cfg ? co2_report_cfg->minInterval : 10;
-  if (period_sec < 2) {
-    period_sec = 2;
-  }
-  if (!clock_time_exceed(co2_measurement_time, SEC_TO_US(period_sec ? period_sec : 1))) {
+  if (!need_update(co2_report_cfg, 10, 2, &co2_measurement_time)) {
     return;
   }
-  co2_measurement_time = clock_time();
 
   u8 packet[] = {0x64, 0x69, 0x03, 0x5E, 0x4E};
   drv_uart_tx_start(packet, ARRAY_SIZE(packet));
